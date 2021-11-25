@@ -26,11 +26,11 @@ def dropin(X, y):
 
 
 
-def preprocess(load=False):
+def preprocess(load=True):
     dirc = "ADFA-LD/Training_Data_Master/"
     dirc_val = "ADFA-LD/Validation_Data_Master/"
     dic_attack ="ADFA-LD/Attack_Data_Master/"
-    arrayfile = "./arrayfile/"
+    arraydir = "arrayfile/"
     xtrainlist=[]
     ytrainlist=[]
     arraylist=[]
@@ -42,14 +42,13 @@ def preprocess(load=False):
             arraylist.append(array)
     else :
         alltraces = inputdata.get_all_call_sequences(dirc)
-        arraylist=inputdata.lists_of_list_into_big_matrix(alltraces)
+        arraylist=inputdata.list_to_matrix(alltraces)
     for array in arraylist:
         x_train = array[:,:-1]
         y_train = array[:,-1]
-
-        print ("The train data size is that ")
-        print (x_train.shape)
-        print (y_train.shape)
+        print ("The train data size:","xtrain",x_train.shape,"ytrain",y_train.shape)
+        # print (x_train.shape)
+        # print (y_train.shape)
         xtrainlist.append(x_train)
         ytrainlist.append(y_train)
 

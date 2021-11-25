@@ -131,7 +131,7 @@ def sequence_n_gram_parsing(alist,n_gram=20,num_class=341):
     ans = np.array(ans)
     return (ans)
 
-def lists_of_list_into_big_matrix(allthelist,n_gram=20,save=False):
+def list_to_matrix(allthelist,n_gram=20,save=True):
 
     array = sequence_n_gram_parsing(allthelist[0])
     arraylist = []
@@ -148,8 +148,8 @@ def lists_of_list_into_big_matrix(allthelist,n_gram=20,save=False):
         else:
             array = np.concatenate((array, tmp), axis=0)
         
-        #if len(arraylist) > 2 :
-        #    break 
+        # if len(arraylist) > 2 :
+        #     break 
         percent = (i+0.0)/len(allthelist)
         io_helper.drawProgressBar(percent)
 
@@ -161,8 +161,9 @@ def lists_of_list_into_big_matrix(allthelist,n_gram=20,save=False):
     print ("done")
     
     if save :
-        for i in range len(arraylist):
-            fname = "array_"+str(i)+".pickle"
+        fpath="arrayfile/"
+        for i in range (len(arraylist)):
+            fname = fpath+"array_"+str(i)+".pickle"
             io_helper.saveintopickle(arraylist[i],fname)
     return arraylist
 
@@ -182,5 +183,5 @@ if __name__ == "__main__":
     #get_attack_subdir(dic_attack)
     #print ("XxxxxxxXXXXXXXXXXX")
     #val1 = get_all_call_sequences(dirc_val)
-    att = get_all_call_sequences(dirc)
-    lists_of_list_into_big_matrix(att)
+    all_train = get_all_call_sequences(dirc)
+    list_to_matrix(all_train)
