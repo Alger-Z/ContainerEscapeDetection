@@ -8,12 +8,12 @@ import numpy as np
 
 import io_helper
 
-def readfilesfromAdir(dataset):
+def readfilesfromAdir(datadir):
     #read a list of files
-    files = os.listdir(dataset)
+    files = os.listdir(datadir)
     files_absolute_paths = []
-    for i in files:
-        files_absolute_paths.append(dataset+str(i))
+    for file in files:
+        files_absolute_paths.append(os.path.join(datadir,str(file)))
     return files_absolute_paths
 
 
@@ -31,7 +31,7 @@ def get_attack_subdir(path):
     for i in range(0,len(subdirectories)):
         subdirectories[i] = path + subdirectories[i]
 
-    print (subdirectories)
+    #print (subdirectories)
     return (subdirectories)
 
 
@@ -131,7 +131,7 @@ def sequence_n_gram_parsing(alist,n_gram=20,num_class=341):
     ans = np.array(ans)
     return (ans)
 
-def list_to_matrix(allthelist,n_gram=20,save=True):
+def list_to_matrix(allthelist,atype,n_gram=20,save=True):
 
     array = sequence_n_gram_parsing(allthelist[0])
     arraylist = []
@@ -142,14 +142,14 @@ def list_to_matrix(allthelist,n_gram=20,save=True):
         #print ("tmp shape")
         #print (tmp.shape)
         
-        if (len(array)> 10000):
+        if (len(array)> 100):
             arraylist.append(array)
             array=tmp
         else:
             array = np.concatenate((array, tmp), axis=0)
         
-        # if len(arraylist) > 2 :
-        #     break 
+        if len(arraylist) > 2 :
+            break 
         percent = (i+0.0)/len(allthelist)
         io_helper.drawProgressBar(percent)
 
@@ -161,9 +161,11 @@ def list_to_matrix(allthelist,n_gram=20,save=True):
     print ("done")
     
     if save :
-        fpath="arrayfile/"
+        if '/' in atype:
+            att_type,atype=atype.split('/')[1],atype.split('/')[0]
+        fpath="arrayfile/"+atype+"/"
         for i in range (len(arraylist)):
-            fname = fpath+"array_"+str(i)+".pickle"
+            fname = fpath+att_type+str(i)+".pickle"
             io_helper.saveintopickle(arraylist[i],fname)
     return arraylist
 
@@ -172,7 +174,7 @@ def list_to_matrix(allthelist,n_gram=20,save=True):
 if __name__ == "__main__":
     dirc = "ADFA-LD/Training_Data_Master/"
     dirc_val = "ADFA-LD/Validation_Data_Master/"
-    dic_attack ="ADFA-LD/Attack_Data_Master/"
+    dic_att ="ADFA-LD/Attack_Data_Master/"
     # train1 = get_all_call_sequences(dirc)
 
     # test = [i for i in range(0,300)]
@@ -180,8 +182,16 @@ if __name__ == "__main__":
     # print (type(array))
     # print (array.shape)
 
-    #get_attack_subdir(dic_attack)
-    #print ("XxxxxxxXXXXXXXXXXX")
-    #val1 = get_all_call_sequences(dirc_val)
-    all_train = get_all_call_sequences(dirc)
-    list_to_matrix(all_train)
+    # print('Train data processing ...........')
+    # all_train = get_all_call_sequences(dirc)
+    # list_to_matrix(all_train,'train')
+    
+    # print('Val data processing ...........')
+    # all_val = get_all_call_sequences(dirc_val)
+    # list_to_matrix(all_val,'val')
+    
+    print('Att data processing ...........')
+    att_subdir=get_attack_subdir(dic_att)
+    for att in att_subdir:
+        all_att = get_all_call_sequences(att)
+        list_to_matrix(all_att,'att'+'/'+os.path.basename(att))

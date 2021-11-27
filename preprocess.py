@@ -52,7 +52,7 @@ def preprocess(load=True):
         xtrainlist.append(x_train)
         ytrainlist.append(y_train)
 
-    return (xtrainlist,ytrainlist)
+    return (xtrainlist,ytrainlist,xtestlist,ytestlist)
 
 
 if __name__ =="__main__":

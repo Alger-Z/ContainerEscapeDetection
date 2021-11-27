@@ -84,14 +84,20 @@ def run_network(model=None, data=None):
 
     if data is None:
         print 'Loading data... '
-        # train on first 700 samples and test on next 300 samples (has anomaly)
         xtrainlist, ytrainlist  = preprocess.preprocess()
     else:
         X_train, y_train = data
-    model=load_model_and_weight_from_file()
+    
+    
     if model is None:
-        model = build_model()
+        try :
+            model=load_model_and_weight_from_file()
+        except Exception as e:
+            print 'load model failed :',e
+        if model is None:
+            model= build_model()
     else :
+        print 'modle compile'
         model.compile(loss="categorical_crossentropy", optimizer='rmsprop',  metrics=['accuracy'])
     print("Training...")
 
@@ -110,10 +116,11 @@ def run_network(model=None, data=None):
     save_model_weight_into_file(model)
     print("Done Training...")
 
-    #predicted = model.predict(X_test)
-    #print("Reshaping predicted")
-    #predicted = np.reshape(predicted, (predicted.size,))
-
+    predicted = model.predict(X_test)
+    print("Reshaping predicted")
+    predicted = np.reshape(predicted, (predicted.size,))
+def plot_roc_cuve(fpr,tpr):
+    plt.plot
 
     """
     except KeyboardInterrupt:
