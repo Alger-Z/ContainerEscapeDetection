@@ -1,0 +1,1 @@
+{"access": 124, "stat": 502, "open_by_handle_at": 6, "getdents": 14, "dup2": 35, "lstat": 217, "mkdir": 6, "arch_prctl": 54, "pipe": 21, "chown": 18, "readlink": 41, "getpgrp": 2, "select": 404, "newfstatat": 67}

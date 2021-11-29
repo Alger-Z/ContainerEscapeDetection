@@ -26,33 +26,51 @@ def dropin(X, y):
 
 
 
-def preprocess(load=True):
+def preprocess(load=True,step='train'):
     dirc = "ADFA-LD/Training_Data_Master/"
     dirc_val = "ADFA-LD/Validation_Data_Master/"
     dic_attack ="ADFA-LD/Attack_Data_Master/"
     arraydir = "arrayfile/"
     xtrainlist=[]
     ytrainlist=[]
-    arraylist=[]
+    xtestlist=[]
+    ytestlist=[]
+    train_arrlist=[]
+    test_arrlist=[]
+    att_arrlist=[]
     # to fix ,only read a test pickle file
     if load :
-        arrayfiles=inputdata.readfilesfromAdir(arraydir)
-        for each in arrayfiles:
-            array= io_helper.loadfrompickle(each)
-            arraylist.append(array)
+        
+        if step == 'train':   
+            train_arrfs=inputdata.readfilesfromAdir(arraydir+'/train')
+        
+            for each in train_arrfs:
+                train_arr= io_helper.loadfrompickle(each)
+                train_arrlist.append(train_arr)
+        if step == 'test':      
+            test_arrfs = inputdata.readfilesfromAdir(arraydir+'/val')
+            for each in test_arrfs:
+                test_arr= io_helper.loadfrompickle(each)
+                test_arrlist.append(test_arr)
     else :
-        alltraces = inputdata.get_all_call_sequences(dirc)
-        arraylist=inputdata.list_to_matrix(alltraces)
-    for array in arraylist:
-        x_train = array[:,:-1]
-        y_train = array[:,-1]
-        print ("The train data size:","xtrain",x_train.shape,"ytrain",y_train.shape)
-        # print (x_train.shape)
-        # print (y_train.shape)
-        xtrainlist.append(x_train)
-        ytrainlist.append(y_train)
-
-    return (xtrainlist,ytrainlist,xtestlist,ytestlist)
+        train_arrlist,test_arrlist,att_arrlist=inputdata.process_log()
+        
+    if step == 'train':  
+        for array in train_arrlist:
+            x_train = array[:,:-1]
+            y_train = array[:,-1]
+            print ("The train data size:","xtrain",x_train.shape,"ytrain",y_train.shape)
+            xtrainlist.append(x_train)
+            ytrainlist.append(y_train)
+            return (xtrainlist,ytrainlist)
+    if step == 'test':  
+        for array in test_arrlist:
+            x_test = array[:,:-1]
+            y_test = array[:,-1]
+            print ("The train data size:","xtrain",x_test.shape,"ytrain",y_test.shape)
+            xtestlist.append(x_test)
+            ytestlist.append(y_test)
+            return (xtestlist,ytestlist)
 
 
 if __name__ =="__main__":

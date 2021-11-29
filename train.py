@@ -14,7 +14,7 @@ import preprocess
 
 # Global hyper-parameters
 sequence_length = 19
-epochs = 50
+epochs = 3
 batch_size = 50
 feature_dimension = 341
 
@@ -49,8 +49,7 @@ def build_model():
     layers = {'input': feature_dimension, 'hidden1': 64, 'hidden2': 256, 'hidden3': 100, 'output': feature_dimension}
 
     model.add(LSTM(
-            input_length=sequence_length,
-            input_dim=layers['input'],
+            input_shape=(sequence_length,layers['input']),
             output_dim=layers['hidden1'],
             return_sequences=True))
     model.add(Dropout(0.2))
@@ -78,15 +77,18 @@ def build_model():
     return model
 
 
-def run_network(model=None, data=None):
+def run_network(model=None, train_data=None,act='train'):
 
     global_start_time = time.time()
 
-    if data is None:
+    if train_data is None:
         print 'Loading data... '
-        xtrainlist, ytrainlist  = preprocess.preprocess()
+        if act == 'train':
+            xtrainlist, ytrainlist  = preprocess.preprocess()
+        if act == 'predict':
+            xtestlist,ytestlist = preprocess.preprocess(step='test')
     else:
-        X_train, y_train = data
+        X_train, y_train = train_data
     
     
     if model is None:
@@ -96,30 +98,48 @@ def run_network(model=None, data=None):
             print 'load model failed :',e
         if model is None:
             model= build_model()
-    else :
-        print 'modle compile'
-        model.compile(loss="categorical_crossentropy", optimizer='rmsprop',  metrics=['accuracy'])
-    print("Training...")
-
-    for X_train,y_train in zip(xtrainlist,ytrainlist):
-        print ("X_train, y_train,shape")
-        print (X_train.shape)
-        print (y_train.shape)
-        print '\nData Loaded. Compiling...\n'
     
-        model.fit(
-            X_train, y_train,
-            batch_size=batch_size,
-            epochs=epochs,
-            validation_split=0.05)
-        model.summary()
-    save_model_weight_into_file(model)
-    print("Done Training...")
-
-    predicted = model.predict(X_test)
-    print("Reshaping predicted")
-    predicted = np.reshape(predicted, (predicted.size,))
-def plot_roc_cuve(fpr,tpr):
+    print 'Modle compile'
+    model.compile(loss="categorical_crossentropy", optimizer='rmsprop',  metrics=['accuracy'])
+    if act == 'train':
+        print("Training...")
+        for X_train,y_train in zip(xtrainlist,ytrainlist):    
+            print ("X_train, y_train,shape")
+            print (X_train.shape)
+            print (y_train.shape)
+            print '\n \n Data Loaded. Compiling...\n \n'
+            history=model.fit(
+                X_train, y_train,
+                batch_size=batch_size,
+                epochs=epochs,
+                validation_split=0.05)
+            model.summary()
+        save_model_weight_into_file(model)
+        print("Done Training...")
+    if act == 'predict':
+        for xtest,ytest in zip(xtestlist,ytestlist):
+            print("\n \n predicting \n \n")
+            predicted = model.predict(xtest)
+            print("Reshaping predicted")
+            predicted = np.reshape(predicted, (predicted.size,))
+            
+            plt.figure(1)
+            plt.subplot(311)
+            plt.title("Actual Test Signal w/Anomalies")
+            plt.plot(ytest[:len(ytest)], 'b')
+            plt.subplot(312)
+            plt.title("Predicted Signal")
+            plt.plot(predicted[:len(ytest)], 'g')
+            plt.subplot(313)
+            plt.title("Squared Error")
+            mse = ((ytest - predicted) ** 2)
+            plt.plot(mse, 'r')
+            #plt.show()
+            fig_path =os.getcwd()+'/test.png'
+            plt.savefig(fig_path)
+            break 
+        print("done")
+def plot_roc_curve(fpr,tpr):
     plt.plot
 
     """
@@ -145,9 +165,7 @@ def plot_roc_cuve(fpr,tpr):
         print("plotting exception")
         print str(e)
     print 'Training duration (s) : ', time.time() - global_start_time
-
-    return model, y_test, predicted
     """
 
 if __name__ == "__main__":
-    run_network()
+    run_network(act='predict')

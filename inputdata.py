@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-__author__ ="Ktian"
 import os
 import sys
 import numpy as np
-
 import io_helper
+
+
 
 def readfilesfromAdir(datadir):
     #read a list of files
@@ -17,7 +16,6 @@ def readfilesfromAdir(datadir):
     return files_absolute_paths
 
 
-file = "ADFA-LD/Training_Data_Master/UTD-0001.txt"
 #this is used to read a char sequence from
 def readCharsFromFile(file):
     channel_values = open(file).read().split()
@@ -36,15 +34,15 @@ def get_attack_subdir(path):
 
 
 def get_all_call_sequences(dire):
-    files = readfilesfromAdir(dire)
+    try:
+        files = readfilesfromAdir(dire)
+    except Exception as e:
+        print "skip dire",dire
+        return []
     allthelist = []
-    print (len(files))
-
-    for eachfile in files:
-        if not eachfile.endswith("DS_Store"):
-            allthelist.append(readCharsFromFile(eachfile))
-        else:
-            print ("Skip the file "+ str(eachfile))
+    #print (len(files))
+    for eachfile in files: 
+        allthelist.append(readCharsFromFile(eachfile))  
 
     elements = []
     for item in allthelist:
@@ -163,35 +161,44 @@ def list_to_matrix(allthelist,atype,n_gram=20,save=True):
     if save :
         if '/' in atype:
             att_type,atype=atype.split('/')[1],atype.split('/')[0]
-        fpath="arrayfile/"+atype+"/"
-        for i in range (len(arraylist)):
-            fname = fpath+att_type+str(i)+".pickle"
-            io_helper.saveintopickle(arraylist[i],fname)
+            fpath="arrayfile/"+atype+"/"
+            for i in range (len(arraylist)):
+                fname = fpath+att_type+str(i)+".pickle"
+                io_helper.saveintopickle(arraylist[i],fname)
+        else:
+            fpath="arrayfile/"+atype+"/"
+            for i in range (len(arraylist)):
+                fname = fpath+atype+str(i)+".pickle"
+                io_helper.saveintopickle(arraylist[i],fname)
     return arraylist
 
-
-
-if __name__ == "__main__":
+def process_log():
+    att_arrlist=[]
+    train_arrlist=[]
+    val_arrlist=[]
     dirc = "ADFA-LD/Training_Data_Master/"
     dirc_val = "ADFA-LD/Validation_Data_Master/"
     dic_att ="ADFA-LD/Attack_Data_Master/"
-    # train1 = get_all_call_sequences(dirc)
-
-    # test = [i for i in range(0,300)]
-    # array = sequence_n_gram_parsing(test)
-    # print (type(array))
-    # print (array.shape)
-
     # print('Train data processing ...........')
     # all_train = get_all_call_sequences(dirc)
-    # list_to_matrix(all_train,'train')
+    # train_arrlist=list_to_matrix(all_train,'train')
     
     # print('Val data processing ...........')
     # all_val = get_all_call_sequences(dirc_val)
-    # list_to_matrix(all_val,'val')
+    # val_arrlist=list_to_matrix(all_val,'val')
     
     print('Att data processing ...........')
     att_subdir=get_attack_subdir(dic_att)
     for att in att_subdir:
-        all_att = get_all_call_sequences(att)
-        list_to_matrix(all_att,'att'+'/'+os.path.basename(att))
+        try:
+            all_att = get_all_call_sequences(att)
+        except:
+            print ("skip dir %s",att)
+            continue
+        att_arrlist.append(list_to_matrix(all_att,'att'+'/'+os.path.basename(att)))
+    return (train_arrlist,val_arrlist,att_arrlist)
+if __name__ == "__main__":
+
+    process_log()
+
+
