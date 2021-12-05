@@ -9,7 +9,7 @@ from keras.layers.recurrent import LSTM
 from keras.models import Sequential
 from keras.models import model_from_json
 
-
+import sys
 import preprocess
 from visualization import roc_plt
 
@@ -100,7 +100,7 @@ def run_network(model=None, train_data=None,act='train'):
         if model is None:
             model= build_model()
     
-    print 'Modle compile'
+    print 'Model compile'
     model.compile(loss="categorical_crossentropy", optimizer='rmsprop',  metrics=['accuracy'])
     if act == 'train':
         print("Training...")
@@ -157,4 +157,9 @@ def run_network(model=None, train_data=None,act='train'):
     
 
 if __name__ == "__main__":
-    run_network(act='predict')
+    try: 
+        action=sys.argv[1]
+        print( "run for %s",action)
+        run_network(act=action)
+    except Exception as e:
+        print(sys.argv,e)
