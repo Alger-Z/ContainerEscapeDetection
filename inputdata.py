@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from logging import debug
 import os
 import sys
 import numpy as np
 import io_helper
 
-
+mydebug =True
 
 def readfilesfromAdir(datadir):
     #read a list of files
@@ -139,15 +140,20 @@ def list_to_matrix(allthelist,atype,n_gram=20,save=True):
 
         #print ("tmp shape")
         #print (tmp.shape)
-        
-        if (len(array)> 100):
+        if mydebug :
+            arraysize = 20 
+        else :
+            arraysize = 30000
+        if (len(array)> arraysize):
             arraylist.append(array)
             array=tmp
         else:
             array = np.concatenate((array, tmp), axis=0)
-        
-        if len(arraylist) > 2 :
-            break 
+        if mydebug :
+            if len(arraylist) > 2 :
+                break 
+        if len(arraylist) > 10 :
+            break
         percent = (i+0.0)/len(allthelist)
         io_helper.drawProgressBar(percent)
 
@@ -183,9 +189,9 @@ def process_log():
     # all_train = get_all_call_sequences(dirc)
     # train_arrlist=list_to_matrix(all_train,'train')
     
-    # print('Val data processing ...........')
-    # all_val = get_all_call_sequences(dirc_val)
-    # val_arrlist=list_to_matrix(all_val,'val')
+    print('Val data processing ...........')
+    all_val = get_all_call_sequences(dirc_val)
+    val_arrlist=list_to_matrix(all_val,'val')
     
     print('Att data processing ...........')
     att_subdir=get_attack_subdir(dic_att)
@@ -198,7 +204,7 @@ def process_log():
         att_arrlist.append(list_to_matrix(all_att,'att'+'/'+os.path.basename(att)))
     return (train_arrlist,val_arrlist,att_arrlist)
 if __name__ == "__main__":
-
+    mydebug =True
     process_log()
 
 

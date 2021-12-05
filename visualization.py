@@ -70,12 +70,12 @@ def show_wv(words_vocab,words_vec):
 
 
 
-def roc_plt(y_tr,y_prd):
+def roc_plt(y_true,y_prd):
     y_prd = [np.argmax(y) for y in y_prd]  # 取出y中元素最大值所对应的索引
-    y_tr = [np.argmax(y) for y in y_tr]
-    y_p=[]
-    for res in y_prd:
-        y_p.append(y_prd.index(np.max(res)))
+    y_tr = [np.argmax(y) for y in y_true]
+    # y_p=[]
+    # for res in y_prd:
+    #     y_p.append(y_prd.index(np.max(res)))
     # foundone(y_prd)
     # foundone(y_tr)
     
@@ -91,3 +91,22 @@ def roc_plt(y_tr,y_prd):
     plt.legend(loc='best')
     plt.savefig('ROC.png')
     #plt.show() 
+"""
+    try:
+        plt.figure(1)
+        plt.subplot(311)
+        plt.title("Actual Test Signal w/Anomalies")
+        plt.plot(y_test[:len(y_test)], 'b')
+        plt.subplot(312)
+        plt.title("Predicted Signal")
+        plt.plot(predicted[:len(y_test)], 'g')
+        plt.subplot(313)
+        plt.title("Squared Error")
+        mse = ((y_test - predicted) ** 2)
+        plt.plot(mse, 'r')
+        plt.show()
+    except Exception as e:
+        print("plotting exception")
+        print str(e)
+    print 'Training duration (s) : ', time.time() - global_start_time
+"""

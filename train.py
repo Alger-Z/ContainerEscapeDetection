@@ -11,6 +11,7 @@ from keras.models import model_from_json
 
 
 import preprocess
+from visualization import roc_plt
 
 # Global hyper-parameters
 sequence_length = 19
@@ -117,55 +118,43 @@ def run_network(model=None, train_data=None,act='train'):
         save_model_weight_into_file(model)
         print("Done Training...")
     if act == 'predict':
+        acc=[] 
         for xtest,ytest in zip(xtestlist,ytestlist):
             print("\n \n predicting \n \n")
             predicted = model.predict(xtest)
-            print("Reshaping predicted")
-            predicted = np.reshape(predicted, (predicted.size,))
             
-            plt.figure(1)
-            plt.subplot(311)
-            plt.title("Actual Test Signal w/Anomalies")
-            plt.plot(ytest[:len(ytest)], 'b')
-            plt.subplot(312)
-            plt.title("Predicted Signal")
-            plt.plot(predicted[:len(ytest)], 'g')
-            plt.subplot(313)
-            plt.title("Squared Error")
-            mse = ((ytest - predicted) ** 2)
-            plt.plot(mse, 'r')
-            #plt.show()
-            fig_path =os.getcwd()+'/test.png'
-            plt.savefig(fig_path)
+            y_prd = [np.argmax(y) for y in predicted]  # 取出y中元素最大值所对应的索引
+            y_tr = [np.argmax(y) for y in ytest]
+            acc=0
+            for yp,yt in zip(y_prd,y_tr):
+                if yp == yt :
+                    acc =acc+1
+            acc= acc/float(len(y_prd))
+            print ("acc for len %d : %f ",len(y_prd),acc )
+            #roc_plt(predicted,ytest)
+            
+            # print("Reshaping predicted")
+            # predicted = np.reshape(predicted, (predicted.size,))
+            
+            # plt.figure(1)
+            # plt.subplot(311)
+            # plt.title("Actual Test Signal w/Anomalies")
+            # plt.plot(ytest[:len(ytest)], 'b')
+            # plt.subplot(312)
+            # plt.title("Predicted Signal")
+            # plt.plot(predicted[:len(ytest)], 'g')
+            # plt.subplot(313)
+            # plt.title("Squared Error")
+            # mse = ((ytest - predicted) ** 2)
+            # plt.plot(mse, 'r')
+            # #plt.show()
+            # fig_path =os.getcwd()+'/test.png'
+            # plt.savefig(fig_path)
             break 
         print("done")
-def plot_roc_curve(fpr,tpr):
-    plt.plot
 
-    """
-    except KeyboardInterrupt:
-        print("prediction exception")
-        print 'Training duration (s) : ', time.time() - global_start_time
-        return model, y_test, 0
 
-    try:
-        plt.figure(1)
-        plt.subplot(311)
-        plt.title("Actual Test Signal w/Anomalies")
-        plt.plot(y_test[:len(y_test)], 'b')
-        plt.subplot(312)
-        plt.title("Predicted Signal")
-        plt.plot(predicted[:len(y_test)], 'g')
-        plt.subplot(313)
-        plt.title("Squared Error")
-        mse = ((y_test - predicted) ** 2)
-        plt.plot(mse, 'r')
-        plt.show()
-    except Exception as e:
-        print("plotting exception")
-        print str(e)
-    print 'Training duration (s) : ', time.time() - global_start_time
-    """
+    
 
 if __name__ == "__main__":
     run_network(act='predict')

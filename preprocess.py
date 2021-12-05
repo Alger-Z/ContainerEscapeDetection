@@ -42,13 +42,13 @@ def preprocess(load=True,step='train'):
     if load :
         
         if step == 'train':   
-            train_arrfs=inputdata.readfilesfromAdir(arraydir+'/train')
+            train_arrfs=inputdata.readfilesfromAdir(arraydir+'train')
         
             for each in train_arrfs:
                 train_arr= io_helper.loadfrompickle(each)
                 train_arrlist.append(train_arr)
         if step == 'test':      
-            test_arrfs = inputdata.readfilesfromAdir(arraydir+'/val')
+            test_arrfs = inputdata.readfilesfromAdir(arraydir+'val')
             for each in test_arrfs:
                 test_arr= io_helper.loadfrompickle(each)
                 test_arrlist.append(test_arr)
