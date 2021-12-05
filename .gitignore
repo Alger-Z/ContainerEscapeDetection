@@ -3,4 +3,5 @@ arrayfile/*
 *.zip
 tmp/*
 data/*
-
+*.h5
+*.json
