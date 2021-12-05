@@ -7,27 +7,27 @@ import json
 from typing import KeysView
 
 def gen_sc_map():
-    # get sc map from new syscall table
-    # with open(sc_tb_file) as tbf:
-    #     for line in iter(tbf.readline,'\n'):
-    #         line=line.split()
-    #         sc_map[line[2]]=line[0]
+    #get sc map from new syscall table
+    with open(sc_tb_file) as tbf:
+        for line in iter(tbf.readline,'\n'):
+            line=line.split()
+            sc_map[line[2]]=line[0]
     
     # get sc map from ADFA syscall table
-    with open(sc_adfa) as tbf:
-        for line in iter(tbf.readline,''):
-            if not line:
-                break
-            if line=='\n':
-                continue
-            if(line.startswith("#define")): 
-                #print (line)
-                line=line.split()
-                # lines.append(line)
-                if len(line) ==3 and str(line[2]).isdigit() :
-                    sc_name= line[1][5:]
-                    sc_num=line[2]
-                    sc_map[sc_name]=sc_num
+    # with open(sc_adfa) as tbf:
+    #     for line in iter(tbf.readline,''):
+    #         if not line:
+    #             break
+    #         if line=='\n':
+    #             continue
+    #         if(line.startswith("#define")): 
+    #             #print (line)
+    #             line=line.split()
+    #             # lines.append(line)
+    #             if len(line) ==3 and str(line[2]).isdigit() :
+    #                 sc_name= line[1][5:]
+    #                 sc_num=line[2]
+    #                 sc_map[sc_name]=sc_num
             # if line[0] == "#define":
             #     sc_name=line[1][5:]
             #     sc_map[sc_name]=line[2]
@@ -114,8 +114,8 @@ if __name__ == "__main__":
     #sc_tb_pickle= "sc_map.pickle"
     sc_adfa="adfa-syscall.h"
     sc_map_json="sc_map.json"
-    log_path= "data/syscall_log"
-    txt_path="data/old/"
+    log_path= "data/mysql/read"
+    txt_path="data/mysqltxt/read/"
     sc_map={}
     failed={}
     sc_n2o={ 

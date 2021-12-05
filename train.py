@@ -88,6 +88,10 @@ def run_network(model=None, train_data=None,act='train'):
             xtrainlist, ytrainlist  = preprocess.preprocess()
         if act == 'predict':
             xtestlist,ytestlist = preprocess.preprocess(step='test')
+        if act == 'att':
+            xtestlist,ytestlist = preprocess.preprocess(step='att')
+        if act == 'escp':
+            xtestlist,ytestlist = preprocess.preprocess(step='escp')
     else:
         X_train, y_train = train_data
     
@@ -117,7 +121,7 @@ def run_network(model=None, train_data=None,act='train'):
             model.summary()
         save_model_weight_into_file(model)
         print("Done Training...")
-    if act == 'predict':
+    if act == 'predict' or 'att' or 'escp':
         acc=[] 
         for xtest,ytest in zip(xtestlist,ytestlist):
             print("\n \n predicting \n \n")
@@ -150,7 +154,7 @@ def run_network(model=None, train_data=None,act='train'):
             # #plt.show()
             # fig_path =os.getcwd()+'/test.png'
             # plt.savefig(fig_path)
-            break 
+            #break 
         print("done")
 
 

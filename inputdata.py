@@ -16,6 +16,16 @@ def readfilesfromAdir(datadir):
         files_absolute_paths.append(os.path.join(datadir,str(file)))
     return files_absolute_paths
 
+def dirlist(path, allfile):
+    filelist = os.listdir(path)
+
+    for filename in filelist:
+        filepath = os.path.join(path, filename)
+        if os.path.isdir(filepath):
+            dirlist(filepath, allfile)
+        else:
+            allfile.append(filepath)
+    return allfile
 
 #this is used to read a char sequence from
 def readCharsFromFile(file):
@@ -36,7 +46,7 @@ def get_attack_subdir(path):
 
 def get_all_call_sequences(dire):
     try:
-        files = readfilesfromAdir(dire)
+        files = dirlist(dire,[])
     except Exception as e:
         print "skip dire",dire
         return []
@@ -69,7 +79,7 @@ def get_all_call_sequences(dire):
     for i in range(0,len(allthelist)):
         _max = max(_max,len(allthelist[i]))
         allthelist[i] = map(int,allthelist[i])
-
+    
 
     print ("The maximum length of a sequence is that {}".format(_max))
 
@@ -141,7 +151,7 @@ def list_to_matrix(allthelist,atype,n_gram=20,save=True):
         #print ("tmp shape")
         #print (tmp.shape)
         if mydebug :
-            arraysize = 20 
+            arraysize = 2000 
         else :
             arraysize = 30000
         if (len(array)> arraysize):
@@ -182,27 +192,40 @@ def process_log():
     att_arrlist=[]
     train_arrlist=[]
     val_arrlist=[]
-    dirc = "ADFA-LD/Training_Data_Master/"
-    dirc_val = "ADFA-LD/Validation_Data_Master/"
-    dic_att ="ADFA-LD/Attack_Data_Master/"
+    # dirc = "ADFA-LD/Training_Data_Master/"
+    # dirc_val = "ADFA-LD/Validation_Data_Master/"
+    # dic_att ="ADFA-LD/Attack_Data_Master/"
+    # dirc_escp = "data/old"
+    dirc = "data/mysqltxt/mix/"
+    dirc_val = "data/mysqltxt/read/"
+    dic_att ="data/new"
+    dirc_escp = "data/new"
     # print('Train data processing ...........')
     # all_train = get_all_call_sequences(dirc)
-    # train_arrlist=list_to_matrix(all_train,'train')
+    # train_arrlist=list_to_matrix(all_train,'mytrain')
     
-    print('Val data processing ...........')
-    all_val = get_all_call_sequences(dirc_val)
-    val_arrlist=list_to_matrix(all_val,'val')
+    # print('Val data processing ...........')
+    # all_val = get_all_call_sequences(dirc_val)
+    # val_arrlist=list_to_matrix(all_val,'myval')
     
-    print('Att data processing ...........')
-    att_subdir=get_attack_subdir(dic_att)
-    for att in att_subdir:
-        try:
-            all_att = get_all_call_sequences(att)
-        except:
-            print ("skip dir %s",att)
-            continue
-        att_arrlist.append(list_to_matrix(all_att,'att'+'/'+os.path.basename(att)))
-    return (train_arrlist,val_arrlist,att_arrlist)
+    # print('Att data processing ...........')
+    # att_subdir=get_attack_subdir(dic_att)
+    # for att in att_subdir:
+    #     try:
+    #         all_att = get_all_call_sequences(att)
+    #     except:
+    #         print ("skip dir %s",att)
+    #         continue
+    #     att_arrlist.append(list_to_matrix(all_att,'att'+'/'+os.path.basename(att)))
+    
+    print('escape data processing ...........')
+    all_escp = get_all_call_sequences(dirc_escp)
+    escp_arrlist=list_to_matrix(all_escp,'myescp')
+    
+    return (train_arrlist,val_arrlist,escp_arrlist)
+
+    
+    
 if __name__ == "__main__":
     mydebug =True
     process_log()
