@@ -19,6 +19,17 @@ def load_adfa_training_files(rootdir):
             y.append(0)
     return x, y
 
+def load_escp_files(rootdir):
+    x = []
+    y = []
+    list = os.listdir(rootdir)
+    for i in range(0, len(list)):
+        path = os.path.join(rootdir, list[i])
+        if os.path.isfile(path):
+            x.append(load_one_flle(path))
+            y.append(0)
+    return x, y
+
 def dirlist(path, allfile):
     filelist = os.listdir(path)
 

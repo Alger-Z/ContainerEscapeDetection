@@ -77,6 +77,9 @@ if __name__ == '__main__':
     x2, y2 = load_adfa_webshell_files("./ADFA-LD/Attack_Data_Master/")    # 训练集（attack）
     x3, y3 = load_adfa_training_files("./ADFA-LD/Validation_Data_Master/")  # 验证集（normal）
     att_x,att_y =load_adfa_Attack_files("./ADFA-LD/Attack_Data_Master/")
+    
+    
+    esp_x,esp_y = load_escp_files("./data")
     # 训练集黑白样本混合
     x_train_mixed = x1[:2000] + att_x
     y_train_mixed = y1[:2000] + att_y
@@ -121,74 +124,77 @@ if __name__ == '__main__':
     # 我的预测输出是对应到词表的向量概率分布。。。不知道怎么回事
     
     # lstm 输入填充 
-    from keras.preprocessing import sequence
-    maxlen = 300
-    xtr_pad=sequence.pad_sequences(x_train_mixed,maxlen=maxlen)
-    xte_pad=sequence.pad_sequences(x_validate_mixed,maxlen=maxlen)
+    # from keras.preprocessing import sequence
+    # maxlen = 300
+    # xtr_pad=sequence.pad_sequences(x_train_mixed,maxlen=maxlen)
+    # xte_pad=sequence.pad_sequences(x_validate_mixed,maxlen=maxlen)
     
-    #正常样本词向量化,将训练语料经过词向量表编码成一个行向量（取均值）
-    meanVectorizer = MeanEmbeddingVectorizer(words_vocab)
-    xtrain_vecs = meanVectorizer.transform(xtr_pad)
-    xtest_vecs=meanVectorizer.transform(xte_pad)
+    # #正常样本词向量化,将训练语料经过词向量表编码成一个行向量（取均值）
+    # meanVectorizer = MeanEmbeddingVectorizer(words_vocab)
+    # xtrain_vecs = meanVectorizer.transform(xtr_pad)
+    # xtest_vecs=meanVectorizer.transform(xte_pad)
     
-    foundone(y_validate_mixed,"yval")
-    foundone(y_train_mixed,"ytrain")
+    # foundone(y_validate_mixed,"yval")
+    # foundone(y_train_mixed,"ytrain")
     
-    if os.path.isfile(modelpath2):
-        # 导入模型
-        print "load lstm modeling..."
-        model = load_model(modelpath2)
-    else:
-        model=build_lstm()
-        history=model.fit(
-                    xtrain_vecs, y_train_mixed,
-                    epochs=50,
-                    validation_split=0.05)
-        model.summary()
-        model.save(modelpath2)
-        saveintopickle(history.history,"tr_history.txt")
+    # if os.path.isfile(modelpath2):
+    #     # 导入模型
+    #     print "load lstm modeling..."
+    #     model = load_model(modelpath2)
+    # else:
+    #     model=build_lstm()
+    #     history=model.fit(
+    #                 xtrain_vecs, y_train_mixed,
+    #                 epochs=50,
+    #                 validation_split=0.05)
+    #     model.summary()
+    #     model.save(modelpath2)
+    #     saveintopickle(history.history,"tr_history.txt")
     
-    # Make predictions using the validate set
-    if act == 1 :
-        y_pre = model.predict(xtest_vecs)
-        print "Predict result: ", y_pre
+    # # Make predictions using the validate set
+    # if act == 1 :
+    #     y_pre = model.predict(xtest_vecs)
+    #     print "Predict result: ", y_pre
         
-        #foundone(y_pre,"ypre")
+    #     #foundone(y_pre,"ypre")
 
-        roc_plt(y_validate_mixed,y_pre)
-    # if 1 in y_pre:
+    #     roc_plt(y_validate_mixed,y_pre)
+    # # if 1 in y_pre:
     #     print y_pre.index(1)
     #     print "found 1 in pre"
 
-    # meanVectorizer = MeanEmbeddingVectorizer(words_vocab)
     
-    # x_trainVecs = meanVectorizer.transform(x_train_mixed)
-    # #for i in range(len(x_train)):
-    # #    print x_train[i]
-    # #    print x_trainVecs[i]
-    # #    print ""
-    # # 将验证语料经过词向量表编码成一个行向量（取均值）
-    # x_validateVecs = meanVectorizer.transform(x_validate_mixed)
-    # #for i in range(len(x_train)):
-    # #    print x_validate[i]
-    # #    print x_validateVecs[i]
-    # #    print ""
     
-    # # 根据训练集生成KNN模型
-    # clf = KNeighborsClassifier(n_neighbors=4).fit(x_trainVecs, y_train_mixed)
+    #knn
+    meanVectorizer = MeanEmbeddingVectorizer(words_vocab)
     
-    # scores = cross_val_score(clf, x_trainVecs, y_train_mixed, n_jobs=-1, cv=10)
-    # # 反映KNN模型训练拟合的程度
-    # print "Training accurate: "
-    # print scores
-    # print np.mean(scores)
+    x_trainVecs = meanVectorizer.transform(x_train_mixed)
+    #for i in range(len(x_train)):
+    #    print x_train[i]
+    #    print x_trainVecs[i]
+    #    print ""
+    # 将验证语料经过词向量表编码成一个行向量（取均值）
+    x_validateVecs = meanVectorizer.transform(x_validate_mixed)
+    #for i in range(len(x_train)):
+    #    print x_validate[i]
+    #    print x_validateVecs[i]
+    #    print ""
+    
+    # 根据训练集生成KNN模型
+    clf = KNeighborsClassifier(n_neighbors=4).fit(x_trainVecs, y_train_mixed)
+    
+    scores = cross_val_score(clf, x_trainVecs, y_train_mixed, n_jobs=-1, cv=10)
+    # 反映KNN模型训练拟合的程度
+    print "Training accurate: "
+    print scores
+    print np.mean(scores)
 
-    # # Make predictions using the validate set
-    # y_pre = clf.predict(x_validateVecs)
-    # print "Predict result: ", y_pre
-    # # if 1 in y_pre:
-    # #     print y_pre.index(1)
-    # #     print "found 1 in pre"
+    # Make predictions using the validate set
+    y_pre = clf.predict(x_validateVecs)
+    print "Predict result: ", y_pre
+    # if 1 in y_pre:
+    #     print y_pre.index(1)
+    #     print "found 1 in pre"
  
-    # # 预测的准确度
-    # print "Prediction accurate: %2f" % np.mean(y_pre == y_validate_mixed)
+    # 预测的准确度
+    print "Prediction accurate: %2f" % np.mean(y_pre == y_validate_mixed)

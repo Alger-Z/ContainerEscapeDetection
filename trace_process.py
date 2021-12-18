@@ -73,7 +73,7 @@ def log_to_seq(filepath):
     with open (txt_file, 'w') as t:
         for n in seq:
             t.write(n+' ')
-    t.close()
+    
     
 def start_process():
     global sc_map

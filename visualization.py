@@ -25,7 +25,7 @@ def wv_2d(x_vals, y_vals, labels):
     for i in selected_indices:
         plt.annotate(labels[i], (x_vals[i], y_vals[i]))
     #plt.show()
-    fig_path =os.getcwd()+'/w2c.png'
+    fig_path ='pic/w2c.png'
     plt.savefig(fig_path)
     
 
@@ -89,24 +89,4 @@ def roc_plt(y_true,y_prd):
     plt.ylabel('True positive rate')
     plt.title('ROC curve')
     plt.legend(loc='best')
-    plt.savefig('ROC.png')
-    #plt.show() 
-"""
-    try:
-        plt.figure(1)
-        plt.subplot(311)
-        plt.title("Actual Test Signal w/Anomalies")
-        plt.plot(y_test[:len(y_test)], 'b')
-        plt.subplot(312)
-        plt.title("Predicted Signal")
-        plt.plot(predicted[:len(y_test)], 'g')
-        plt.subplot(313)
-        plt.title("Squared Error")
-        mse = ((y_test - predicted) ** 2)
-        plt.plot(mse, 'r')
-        plt.show()
-    except Exception as e:
-        print("plotting exception")
-        print str(e)
-    print 'Training duration (s) : ', time.time() - global_start_time
-"""
+    plt.savefig('pic/ROC.png')
