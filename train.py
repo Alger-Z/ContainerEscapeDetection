@@ -123,11 +123,11 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
                 validation_split=0.05)
             model.summary()
         if save :
-            save_model_weight_into_file(model,modelname=("modle"+str(n_gram)+"gram.json"),weight=("model"+str(n_gram)+"gram.h5"))
+            save_model_weight_into_file(model,modelname=("model"+str(n_gram)+"gram.json"),weight=("model"+str(n_gram)+"gram.h5"))
             saveintopickle(history,("history"+str(n_gram)+"gram.txt"))
             
         print("Done Training...")
-    if act == 'test' or 'escp':
+    if act == 'test' or act =='escp':
         acc=[] 
         for xtest,ytest in zip(xtestlist,ytestlist):
             print("\n \n predicting \n \n")
@@ -180,6 +180,7 @@ if __name__ == "__main__":
                 load = False
         n=[10,15,20,25]
         for ngram in n :
+            sequence_length=ngram-1
             print( "run for %s debug = %b epoch= %d save = %b ngram=%d",action,debug,epochs,save,ngram)
             run_network(act=action,n_gram=ngram)
     except Exception as e:

@@ -5,7 +5,7 @@ import os
 import sys
 import numpy as np
 import io_helper
-mydebug=False
+mydebug=True
 
 def readfilesfromAdir(datadir):
     #read a list of files
@@ -147,14 +147,14 @@ def list_to_matrix(allthelist,n_gram=20):
     else :
         arraysize = 1000000
         arraycount=10
-    array = sequence_n_gram_parsing(allthelist[0][:],n_gram=n_gram)
+    array = sequence_n_gram_parsing(allthelist[0][:2000],n_gram=n_gram)
     arraylist = []
     if len(allthelist) == 1 :
         arraylist.append(array)
         print(array.shape)
         return arraylist
     for i in range(1,len(allthelist),1):
-        tmp = sequence_n_gram_parsing(allthelist[i][:],n_gram=n_gram)
+        tmp = sequence_n_gram_parsing(allthelist[i][:2000],n_gram=n_gram)
         
         if (len(array)> arraysize):
             arraylist.append(array)
