@@ -5,8 +5,7 @@ import os
 import sys
 import numpy as np
 import io_helper
-
-mydebug =True
+mydebug=False
 
 def readfilesfromAdir(datadir):
     #read a list of files
@@ -141,20 +140,21 @@ def sequence_n_gram_parsing(alist,n_gram=20,num_class=323):
     return (ans)
 
 def list_to_matrix(allthelist,n_gram=20):
+    global mydebug
     if mydebug :
         arraysize = 2000
         arraycount=2 
     else :
         arraysize = 30000
         arraycount=10
-    array = sequence_n_gram_parsing(allthelist[0][:3000])
+    array = sequence_n_gram_parsing(allthelist[0][:30000])
     arraylist = []
     if len(allthelist) == 1 :
         arraylist.append(array)
         print(array.shape)
         return arraylist
     for i in range(1,len(allthelist),1):
-        tmp = sequence_n_gram_parsing(allthelist[i][:3000])
+        tmp = sequence_n_gram_parsing(allthelist[i][:30000])
         
         if (len(array)> arraysize):
             arraylist.append(array)
@@ -177,7 +177,7 @@ def list_to_matrix(allthelist,n_gram=20):
 
     return arraylist
 
-def process_log(step='dvwa_train',save=True):
+def process_log(step='dvwa_train',save=False):
     att_arrlist=[]
     train_arrlist=[]
     val_arrlist=[]

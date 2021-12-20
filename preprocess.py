@@ -26,7 +26,7 @@ def dropin(X, y):
 
 
 
-def preprocess(load=True,step='train'):
+def preprocess(load=False,step='train'):
     # dirc = "ADFA-LD/Training_Data_Master/"
     # dirc_val = "ADFA-LD/Validation_Data_Master/"
     # dic_attack ="ADFA-LD/Attack_Data_Master/"
@@ -68,14 +68,17 @@ def preprocess(load=True,step='train'):
                 arr= io_helper.loadfrompickle(each)
                 arrlist.append(arr)
     else :
-        print (" to do .... ")
-        
-        # if step == 'train':
-        #     train_arrlist=inputdata.process_log('train')
-        # if step == 'test':
-        #     test_arrlist=inputdata.process_log('test')
-        # if step == 'escp':
-        #     arrlist=inputdata.process_log('escp')
+        if step == 'train':   
+            train_arrlist=inputdata.process_log('dvwa_train')
+        if step == 'test':      
+            test_arrfs = inputdata.process_log('dvwa_test')
+        if step == 'mysql_train':
+            train_arrlist=inputdata.process_log('mysql_train')
+        if step == 'mysql_test':
+            test_arrfs = inputdata.process_log('mysql_test')
+        if step == 'escp':
+            arrlist=inputdata.process_log('escp')
+            
     if step == 'train' or 'mysql_train':  
         for array in train_arrlist:
             x_train = array[:,:-1]

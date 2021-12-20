@@ -106,8 +106,8 @@ def run_network(model=None, train_data=None,act='train'):
             model=load_model_and_weight_from_file()
         except Exception as e:
             print 'load model failed :',e
-        if model is None:
-            model= build_model()
+    if model is None:
+        model= build_model()
     
     print 'Model compile'
     model.compile(loss="categorical_crossentropy", optimizer='rmsprop',  metrics=['accuracy'])
@@ -167,7 +167,7 @@ def run_network(model=None, train_data=None,act='train'):
     
 
 if __name__ == "__main__":
-    action='test'
+    action='train'
     debug =True
     if debug :
         epochs = 3
