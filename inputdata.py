@@ -145,16 +145,16 @@ def list_to_matrix(allthelist,n_gram=20):
         arraysize = 2000
         arraycount=2 
     else :
-        arraysize = 30000
+        arraysize = 1000000
         arraycount=10
-    array = sequence_n_gram_parsing(allthelist[0][:30000])
+    array = sequence_n_gram_parsing(allthelist[0][:])
     arraylist = []
     if len(allthelist) == 1 :
         arraylist.append(array)
         print(array.shape)
         return arraylist
     for i in range(1,len(allthelist),1):
-        tmp = sequence_n_gram_parsing(allthelist[i][:30000])
+        tmp = sequence_n_gram_parsing(allthelist[i][:])
         
         if (len(array)> arraysize):
             arraylist.append(array)

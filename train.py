@@ -8,7 +8,7 @@ from keras.layers.core import Dense, Activation, Dropout
 from keras.layers.recurrent import LSTM
 from keras.models import Sequential
 from keras.models import model_from_json
-
+from io_helper import saveintopickle
 import sys
 from W2c import build_lstm
 import preprocess
@@ -126,15 +126,17 @@ def run_network(model=None, train_data=None,act='train'):
             model.summary()
         if save :
             save_model_weight_into_file(model)
+            saveintopickle(history,"history.txt")
+            
         print("Done Training...")
     if act == 'test' or 'escp':
         acc=[] 
         for xtest,ytest in zip(xtestlist,ytestlist):
             print("\n \n predicting \n \n")
-            predicted = model.predict(xtest)
+            predicted = model.predict(xtest[:20000])
             
             y_prd = [np.argmax(y) for y in predicted]  # 取出y中元素最大值所对应的索引
-            y_tr = [np.argmax(y) for y in ytest]
+            y_tr = [np.argmax(y) for y in ytest[:20000]]
             acc=0
             for yp,yt in zip(y_prd,y_tr):
                 if yp == yt :

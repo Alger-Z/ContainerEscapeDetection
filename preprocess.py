@@ -69,17 +69,17 @@ def preprocess(load=False,step='train'):
                 arrlist.append(arr)
     else :
         if step == 'train':   
-            train_arrlist=inputdata.process_log('dvwa_train')
+            train_arrlist=inputdata.process_log(step='dvwa_train')
         if step == 'test':      
-            test_arrfs = inputdata.process_log('dvwa_test')
+            test_arrlist = inputdata.process_log(step='dvwa_test')
         if step == 'mysql_train':
-            train_arrlist=inputdata.process_log('mysql_train')
+            train_arrlist=inputdata.process_log(step='mysql_train')
         if step == 'mysql_test':
-            test_arrfs = inputdata.process_log('mysql_test')
+            test_arrlist = inputdata.process_log(step='mysql_test')
         if step == 'escp':
-            arrlist=inputdata.process_log('escp')
+            arrlist=inputdata.process_log(step='escp')
             
-    if step == 'train' or 'mysql_train':  
+    if step == 'train' or step =='mysql_train':
         for array in train_arrlist:
             x_train = array[:,:-1]
             y_train = array[:,-1]
@@ -87,7 +87,7 @@ def preprocess(load=False,step='train'):
             xtrainlist.append(x_train)
             ytrainlist.append(y_train)
         return (xtrainlist,ytrainlist)
-    if step == 'test'or 'mysql_test':  
+    if step == 'test'or step == 'mysql_test':  
         for array in test_arrlist:
             x_test = array[:,:-1]
             y_test = array[:,-1]
