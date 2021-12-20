@@ -10,15 +10,20 @@ from keras.models import Sequential
 from keras.models import model_from_json
 
 import sys
+from W2c import build_lstm
 import preprocess
 from visualization import roc_plt
 
 # Global hyper-parameters
 sequence_length = 19
-epochs = 3
+epochs = 30
+save=True
+load =True
 batch_size = 50
-feature_dimension = 341
+feature_dimension = 323
 
+
+    
 
 def save_model_weight_into_file(model, modelname="model.json", weight="model.h5"):
     model_json = model.to_json()
@@ -45,7 +50,9 @@ def load_model_and_weight_from_file(modelname="model.json", weight="model.h5"):
     
     return loaded_model
 
-def build_model():
+def build_model(mod='lstm'):
+    if mod == 'lstm ':
+        return build_lstm
     model = Sequential()
     layers = {'input': feature_dimension, 'hidden1': 64, 'hidden2': 256, 'hidden3': 100, 'output': feature_dimension}
 
@@ -85,18 +92,16 @@ def run_network(model=None, train_data=None,act='train'):
     if train_data is None:
         print 'Loading data... '
         if act == 'train':
-            xtrainlist, ytrainlist  = preprocess.preprocess()
-        if act == 'predict':
+            xtrainlist, ytrainlist  = preprocess.preprocess(step='train')
+        if act == 'test':
             xtestlist,ytestlist = preprocess.preprocess(step='test')
-        if act == 'att':
-            xtestlist,ytestlist = preprocess.preprocess(step='att')
         if act == 'escp':
             xtestlist,ytestlist = preprocess.preprocess(step='escp')
     else:
         X_train, y_train = train_data
     
     
-    if model is None:
+    if model is None and load is True:
         try :
             model=load_model_and_weight_from_file()
         except Exception as e:
@@ -119,9 +124,10 @@ def run_network(model=None, train_data=None,act='train'):
                 epochs=epochs,
                 validation_split=0.05)
             model.summary()
-        save_model_weight_into_file(model)
+        if save :
+            save_model_weight_into_file(model)
         print("Done Training...")
-    if act == 'predict' or 'att' or 'escp':
+    if act == 'test' or 'escp':
         acc=[] 
         for xtest,ytest in zip(xtestlist,ytestlist):
             print("\n \n predicting \n \n")
@@ -161,8 +167,16 @@ def run_network(model=None, train_data=None,act='train'):
     
 
 if __name__ == "__main__":
+    action='test'
+    debug =True
+    if debug :
+        epochs = 3
+        save = False
+        if action == 'train':
+            load = False
     try: 
-        action=sys.argv[1]
+        if len(sys.argv) > 1 :
+            action=sys.argv[1]
         print( "run for %s",action)
         run_network(act=action)
     except Exception as e:

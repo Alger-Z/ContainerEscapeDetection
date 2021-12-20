@@ -73,13 +73,15 @@ if __name__ == '__main__':
     #action={0:"train",1:"predict",2:"debug"}
     act=0
     
-    x1, y1 = load_adfa_training_files("./ADFA-LD/Training_Data_Master/")  # 训练集（normal）
-    x2, y2 = load_adfa_webshell_files("./ADFA-LD/Attack_Data_Master/")    # 训练集（attack）
-    x3, y3 = load_adfa_training_files("./ADFA-LD/Validation_Data_Master/")  # 验证集（normal）
-    att_x,att_y =load_adfa_Attack_files("./ADFA-LD/Attack_Data_Master/")
+#    x1, y1 = load_adfa_training_files("./ADFA-LD/Training_Data_Master/")  # 训练集（normal）
+#    x2, y2 = load_adfa_webshell_files("./ADFA-LD/Attack_Data_Master/")    # 训练集（attack）
+#    x3, y3 = load_adfa_training_files("./ADFA-LD/Validation_Data_Master/")  # 验证集（normal）
+#    att_x,att_y =load_adfa_Attack_files("./ADFA-LD/Attack_Data_Master/")
+
+    x1, y1 = load_training_files("/data/mysqltxt/mix")  # 训练集
+    x2, y2 = load_training_files("data/dvwatxt/")    # 训练集
+    esp_x,esp_y = load_escp_files("data/new/")  # 测试集
     
-    
-    esp_x,esp_y = load_escp_files("./data")
     # 训练集黑白样本混合
     x_train_mixed = x1[:2000] + att_x
     y_train_mixed = y1[:2000] + att_y
@@ -99,7 +101,7 @@ if __name__ == '__main__':
         print "load w2c modeling..."
         wv_model = gensim.models.Word2Vec.load(modelpath)
     else:
-        # 将词嵌入到一个100维的向量空间中
+        # 将词嵌入到一个50维的向量空间中
         wv_model = gensim.models.Word2Vec(x_, min_count=1, size=50)
         # 保存模型
         wv_model.save(modelpath)

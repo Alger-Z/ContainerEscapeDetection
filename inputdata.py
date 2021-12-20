@@ -48,7 +48,7 @@ def get_all_call_sequences(dire):
     try:
         files = dirlist(dire,[])
     except Exception as e:
-        print "skip dire",dire
+        print ("%s dir error",dire)
         return []
     allthelist = []
     #print (len(files))
@@ -126,7 +126,7 @@ The num_class here is set as 341
 """
 
 #one function do one thing
-def sequence_n_gram_parsing(alist,n_gram=20,num_class=341):
+def sequence_n_gram_parsing(alist,n_gram=20,num_class=323):
     if len(alist) <= n_gram:
         return alist
 
@@ -140,30 +140,31 @@ def sequence_n_gram_parsing(alist,n_gram=20,num_class=341):
     ans = np.array(ans)
     return (ans)
 
-def list_to_matrix(allthelist,atype,n_gram=20,save=True):
-
-    array = sequence_n_gram_parsing(allthelist[0])
+def list_to_matrix(allthelist,n_gram=20):
+    if mydebug :
+        arraysize = 2000
+        arraycount=2 
+    else :
+        arraysize = 30000
+        arraycount=10
+    array = sequence_n_gram_parsing(allthelist[0][:3000])
     arraylist = []
-    
+    if len(allthelist) == 1 :
+        arraylist.append(array)
+        print(array.shape)
+        return arraylist
     for i in range(1,len(allthelist),1):
-        tmp = sequence_n_gram_parsing(allthelist[i])
-
-        #print ("tmp shape")
-        #print (tmp.shape)
-        if mydebug :
-            arraysize = 2000 
-        else :
-            arraysize = 30000
+        tmp = sequence_n_gram_parsing(allthelist[i][:3000])
+        
         if (len(array)> arraysize):
             arraylist.append(array)
             array=tmp
         else:
             array = np.concatenate((array, tmp), axis=0)
-        if mydebug :
-            if len(arraylist) > 2 :
+        
+        if len(arraylist) > arraycount :
                 break 
-        if len(arraylist) > 10 :
-            break
+            
         percent = (i+0.0)/len(allthelist)
         io_helper.drawProgressBar(percent)
 
@@ -173,61 +174,52 @@ def list_to_matrix(allthelist,atype,n_gram=20,save=True):
     for array in arraylist:
         print (array.shape)
     print ("done")
-    
-    if save :
-        if '/' in atype:
-            att_type,atype=atype.split('/')[1],atype.split('/')[0]
-            fpath="arrayfile/"+atype+"/"
-            for i in range (len(arraylist)):
-                fname = fpath+att_type+str(i)+".pickle"
-                io_helper.saveintopickle(arraylist[i],fname)
-        else:
-            fpath="arrayfile/"+atype+"/"
-            for i in range (len(arraylist)):
-                fname = fpath+atype+str(i)+".pickle"
-                io_helper.saveintopickle(arraylist[i],fname)
+
     return arraylist
 
-def process_log():
+def process_log(step='dvwa_train',save=True):
     att_arrlist=[]
     train_arrlist=[]
     val_arrlist=[]
-    # dirc = "ADFA-LD/Training_Data_Master/"
-    # dirc_val = "ADFA-LD/Validation_Data_Master/"
-    # dic_att ="ADFA-LD/Attack_Data_Master/"
-    # dirc_escp = "data/old"
-    dirc = "data/mysqltxt/mix/"
-    dirc_val = "data/mysqltxt/read/"
-    dic_att ="data/new"
-    dirc_escp = "data/new"
-    # print('Train data processing ...........')
-    # all_train = get_all_call_sequences(dirc)
-    # train_arrlist=list_to_matrix(all_train,'mytrain')
     
-    # print('Val data processing ...........')
-    # all_val = get_all_call_sequences(dirc_val)
-    # val_arrlist=list_to_matrix(all_val,'myval')
+    dir_mysql_train = "data/mix_txt"
+    dir_mysql_test = "data/mysqltxt_test"
+    dir_dvwa_train ="data/dvwatxt"
+    dir_dvwa_test = "data/dvwatxt_test"
+    dir_escp="data/att_withreq"
     
-    # print('Att data processing ...........')
-    # att_subdir=get_attack_subdir(dic_att)
-    # for att in att_subdir:
-    #     try:
-    #         all_att = get_all_call_sequences(att)
-    #     except:
-    #         print ("skip dir %s",att)
-    #         continue
-    #     att_arrlist.append(list_to_matrix(all_att,'att'+'/'+os.path.basename(att)))
-    
-    print('escape data processing ...........')
-    all_escp = get_all_call_sequences(dirc_escp)
-    escp_arrlist=list_to_matrix(all_escp,'myescp')
-    
-    return (train_arrlist,val_arrlist,escp_arrlist)
+    if step == 'dvwa_train':
+        print('dvwa Train data processing ...........')
+        all_train = get_all_call_sequences(dir_dvwa_train)
+        train_arrlist=list_to_matrix(all_train)
+    if step == 'dvwa_test':
+        print('dvwa test data processing ...........')
+        all_train = get_all_call_sequences(dir_dvwa_test)
+        train_arrlist=list_to_matrix(all_train)   
+    if step == 'mysql_train':
+        print('mysql Train data processing ...........')
+        all_train = get_all_call_sequences(dir_mysql_train)
+        train_arrlist=list_to_matrix(all_train)
+    if step == 'mysql_test':
+        print('mysql test data processing ...........')
+        all_train = get_all_call_sequences(dir_mysql_test)
+        train_arrlist=list_to_matrix(all_train)
+    if step == 'escp':
+        print('escape data processing ...........')
+        alltrain = get_all_call_sequences(dir_escp)
+        train_arrlist=list_to_matrix(alltrain)
+    if save :
+        fpath="arrayfile/"+step+"/"
+        for i in range (len(train_arrlist)):
+            fname = fpath+step+str(i)+".pickle"
+            io_helper.saveintopickle(train_arrlist[i],fname)    
+            
+    return train_arrlist
 
     
     
 if __name__ == "__main__":
     mydebug =True
-    process_log()
+    process_log(step='escp')
 
 

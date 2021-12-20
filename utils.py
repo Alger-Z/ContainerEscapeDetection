@@ -1,4 +1,60 @@
+import json,os
+
+sc_tb_file = "syscall_64.tbl"
+#sc_tb_pickle= "sc_map.pickle"
+sc_adfa="adfa-syscall.h"
 
 def foundone (target,name):
     if 1 in target :
         print ('found 1 in' ,name,' and index',target.index(1))
+        
+        
+def gen_sc_map_old(sc_adfa,sc_map_json):
+    #get sc map from ADFA syscall table
+    sc_map={}
+    with open(sc_adfa) as tbf:
+        for line in iter(tbf.readline,''):
+            if not line:
+                break
+            if line=='\n':
+                continue
+            if(line.startswith("#define")): 
+                #print (line)
+                line=line.split()
+                # lines.append(line)
+                if len(line) ==3 and str(line[2]).isdigit() :
+                    sc_name= line[1][5:]
+                    sc_num=line[2]
+                    sc_map[sc_name]=sc_num
+            if line[0] == "#define":
+                sc_name=line[1][5:]
+                sc_map[sc_name]=line[2]
+    with open(sc_map_json,'w') as tmp:
+        json.dump(sc_map,tmp)
+    return sc_map
+
+def gen_sc_map(sc_tb_file='syscall_64.tbl',sc_map_json='sc_map.json'):
+    sc_map={}
+    #get sc map from new syscall table
+    with open(sc_tb_file) as tbf:
+        for line in iter(tbf.readline,'\n'):
+            line=line.split()
+            sc_map[line[2]]=int(line[0])+1
+    with open(sc_map_json,'w') as tmp:
+        json.dump(sc_map,tmp)
+    return sc_map
+
+def load_sc_map(sc_map_json="sc_map.json"):
+        sc_map={}
+        if os.path.isfile(sc_map_json):
+            with open (sc_map_json,'r') as jsfile:
+                sc_map=json.load(jsfile)
+        else:
+            print("failed load syscall from json , generating ..." )   
+            try :
+                sc_map=gen_sc_map(sc_tb_file,sc_map_json)
+            except Exception as e:
+                print("generate syscall pickle error:%s",e)
+        return sc_map
+if __name__ == '__main__':
+    gen_sc_map() 

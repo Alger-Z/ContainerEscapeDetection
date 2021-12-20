@@ -5,48 +5,7 @@ import os
 import sys
 import json
 from typing import KeysView
-
-def gen_sc_map():
-    #get sc map from new syscall table
-    with open(sc_tb_file) as tbf:
-        for line in iter(tbf.readline,'\n'):
-            line=line.split()
-            sc_map[line[2]]=line[0]
-    
-    # get sc map from ADFA syscall table
-    # with open(sc_adfa) as tbf:
-    #     for line in iter(tbf.readline,''):
-    #         if not line:
-    #             break
-    #         if line=='\n':
-    #             continue
-    #         if(line.startswith("#define")): 
-    #             #print (line)
-    #             line=line.split()
-    #             # lines.append(line)
-    #             if len(line) ==3 and str(line[2]).isdigit() :
-    #                 sc_name= line[1][5:]
-    #                 sc_num=line[2]
-    #                 sc_map[sc_name]=sc_num
-            # if line[0] == "#define":
-            #     sc_name=line[1][5:]
-            #     sc_map[sc_name]=line[2]
-                
-    with open(sc_map_json,'w') as tmp:
-        json.dump(sc_map,tmp)
-    return sc_map
-def load_sc_map():
-        sc_map={}
-        try :
-            with open (sc_map_json,'r') as jsfile:
-                sc_map=json.load(jsfile)
-        except IOError as e:
-            print("load syscall  error:%s", e)   
-            try :
-                sc_map=gen_sc_map()
-            except Exception as e:
-                print("generate syscall pickle error:%s",e)
-        return sc_map
+from utils import *
 def log_to_seq(filepath):
     seq=[]
     with open (filepath,'r') as f:
@@ -72,13 +31,13 @@ def log_to_seq(filepath):
     txt_file=txt_path+os.path.splitext(os.path.basename(filepath))[0]+'.txt'
     with open (txt_file, 'w') as t:
         for n in seq:
-            t.write(n+' ')
+            t.write(str(n)+' ')
     
     
 def start_process():
     global sc_map
     if not sc_map :
-        sc_map=load_sc_map()
+        sc_map=load_sc_map(sc_map_json)
     if len(sc_map) ==0:
         print ("sc_map null")
         return
@@ -110,14 +69,13 @@ def start_process():
     
 
 if __name__ == "__main__":
-    sc_tb_file = "syscall_64.tbl"
-    #sc_tb_pickle= "sc_map.pickle"
-    sc_adfa="adfa-syscall.h"
+
     sc_map_json="sc_map.json"
-    log_path= "data/mysql/read"
-    txt_path="data/mysqltxt/read/"
+    log_path= "data/mysql/mix_big"
+    txt_path="data/mysqltxt/mix_big/"
     sc_map={}
     failed={}
+    #map new syscall type to old 
     sc_n2o={ 
      "select":"pselect6",
     "pipe":"pipe2",

@@ -39,34 +39,44 @@ def preprocess(load=True,step='train'):
     yattlist=[]
     train_arrlist=[]
     test_arrlist=[]
-    att_arrlist=[]
+    arrlist=[]
     # to fix ,only read a test pickle file
     if load :
         
         if step == 'train':   
-            train_arrfs=inputdata.readfilesfromAdir(arraydir+'mytrain')
-        
+            train_arrfs=inputdata.readfilesfromAdir(arraydir+'dvwa_train')
             for each in train_arrfs:
                 train_arr= io_helper.loadfrompickle(each)
                 train_arrlist.append(train_arr)
         if step == 'test':      
-            test_arrfs = inputdata.readfilesfromAdir(arraydir+'myval')
+            test_arrfs = inputdata.readfilesfromAdir(arraydir+'dvwa_test')
             for each in test_arrfs:
                 test_arr= io_helper.loadfrompickle(each)
                 test_arrlist.append(test_arr)
-        if step == 'att':
-            att_arrfs = inputdata.readfilesfromAdir(arraydir+'myatt')
-            for each in att_arrfs:
-                att_arr= io_helper.loadfrompickle(each)
-                att_arrlist.append(att_arr)
+        if step == 'mysql_train':
+            arrfs = inputdata.readfilesfromAdir(arraydir+'mysql_train')
+            for each in arrfs:
+                arr= io_helper.loadfrompickle(each)
+                arrlist.append(arr)
+        if step == 'mysql_test':
+            arrfs = inputdata.readfilesfromAdir(arraydir+'mysql_test')
+            for each in arrfs:
+                arr= io_helper.loadfrompickle(each)
+                arrlist.append(arr)
         if step == 'escp':
-            att_arrfs = inputdata.readfilesfromAdir(arraydir+'myescp')
-            for each in att_arrfs:
-                att_arr= io_helper.loadfrompickle(each)
-                att_arrlist.append(att_arr)
+            arrfs = inputdata.readfilesfromAdir(arraydir+'myescp')
+            for each in arrfs:
+                arr= io_helper.loadfrompickle(each)
+                arrlist.append(arr)
     else :
-        train_arrlist,test_arrlist,att_arrlist=inputdata.process_log()
+        print (" to do .... ")
         
+        # if step == 'train':
+        #     train_arrlist=inputdata.process_log('train')
+        # if step == 'test':
+        #     test_arrlist=inputdata.process_log('test')
+        # if step == 'escp':
+        #     arrlist=inputdata.process_log('escp')
     if step == 'train':  
         for array in train_arrlist:
             x_train = array[:,:-1]
@@ -83,11 +93,11 @@ def preprocess(load=True,step='train'):
             xtestlist.append(x_test)
             ytestlist.append(y_test)
         return (xtestlist,ytestlist)
-    if step == 'att'or 'escp':  
-        for array in att_arrlist:
+    if step == 'escp':  
+        for array in arrlist:
             x_att = array[:,:-1]
             y_att = array[:,-1]
-            print ("The att data size:","xatt",x_att.shape,"yatt",y_att.shape)
+            print ("The escp data size:","xatt",x_att.shape,"yatt",y_att.shape)
             xattlist.append(x_att)
             yattlist.append(y_att)
         return (xattlist,yattlist)
