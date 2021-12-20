@@ -42,7 +42,6 @@ def preprocess(load=True,step='train'):
     arrlist=[]
     # to fix ,only read a test pickle file
     if load :
-        
         if step == 'train':   
             train_arrfs=inputdata.readfilesfromAdir(arraydir+'dvwa_train')
             for each in train_arrfs:
@@ -54,15 +53,15 @@ def preprocess(load=True,step='train'):
                 test_arr= io_helper.loadfrompickle(each)
                 test_arrlist.append(test_arr)
         if step == 'mysql_train':
-            arrfs = inputdata.readfilesfromAdir(arraydir+'mysql_train')
-            for each in arrfs:
-                arr= io_helper.loadfrompickle(each)
-                arrlist.append(arr)
+            train_arrfs = inputdata.readfilesfromAdir(arraydir+'mysql_train')
+            for each in train_arrfs:
+                train_arr= io_helper.loadfrompickle(each)
+                train_arrlist.append(train_arr)
         if step == 'mysql_test':
-            arrfs = inputdata.readfilesfromAdir(arraydir+'mysql_test')
-            for each in arrfs:
-                arr= io_helper.loadfrompickle(each)
-                arrlist.append(arr)
+            test_arrfs = inputdata.readfilesfromAdir(arraydir+'mysql_test')
+            for each in test_arrfs:
+                test_arr= io_helper.loadfrompickle(each)
+                test_arrlist.append(test_arr)
         if step == 'escp':
             arrfs = inputdata.readfilesfromAdir(arraydir+'myescp')
             for each in arrfs:
@@ -77,7 +76,7 @@ def preprocess(load=True,step='train'):
         #     test_arrlist=inputdata.process_log('test')
         # if step == 'escp':
         #     arrlist=inputdata.process_log('escp')
-    if step == 'train':  
+    if step == 'train' or 'mysql_train':  
         for array in train_arrlist:
             x_train = array[:,:-1]
             y_train = array[:,-1]
@@ -85,7 +84,7 @@ def preprocess(load=True,step='train'):
             xtrainlist.append(x_train)
             ytrainlist.append(y_train)
         return (xtrainlist,ytrainlist)
-    if step == 'test':  
+    if step == 'test'or 'mysql_test':  
         for array in test_arrlist:
             x_test = array[:,:-1]
             y_test = array[:,-1]

@@ -220,6 +220,6 @@ def process_log(step='dvwa_train',save=True):
     
 if __name__ == "__main__":
     mydebug =True
-    process_log(step='escp')
+    process_log(step='dvwa_train')
 
 
