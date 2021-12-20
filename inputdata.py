@@ -147,14 +147,14 @@ def list_to_matrix(allthelist,n_gram=20):
     else :
         arraysize = 1000000
         arraycount=10
-    array = sequence_n_gram_parsing(allthelist[0][:])
+    array = sequence_n_gram_parsing(allthelist[0][:],n_gram=n_gram)
     arraylist = []
     if len(allthelist) == 1 :
         arraylist.append(array)
         print(array.shape)
         return arraylist
     for i in range(1,len(allthelist),1):
-        tmp = sequence_n_gram_parsing(allthelist[i][:])
+        tmp = sequence_n_gram_parsing(allthelist[i][:],n_gram=n_gram)
         
         if (len(array)> arraysize):
             arraylist.append(array)
@@ -177,7 +177,7 @@ def list_to_matrix(allthelist,n_gram=20):
 
     return arraylist
 
-def process_log(step='dvwa_train',save=False):
+def process_log(step='dvwa_train',save=False,n=20):
     att_arrlist=[]
     train_arrlist=[]
     val_arrlist=[]
@@ -191,22 +191,22 @@ def process_log(step='dvwa_train',save=False):
     if step == 'dvwa_train':
         print('dvwa Train data processing ...........')
         all_train = get_all_call_sequences(dir_dvwa_train)
-        train_arrlist=list_to_matrix(all_train)
+        train_arrlist=list_to_matrix(all_train,n_gram=n)
     if step == 'dvwa_test':
         print('dvwa test data processing ...........')
         all_train = get_all_call_sequences(dir_dvwa_test)
-        train_arrlist=list_to_matrix(all_train)   
+        train_arrlist=list_to_matrix(all_train,n_gram=n)
     if step == 'mysql_train':
         print('mysql Train data processing ...........')
         all_train = get_all_call_sequences(dir_mysql_train)
-        train_arrlist=list_to_matrix(all_train)
+        train_arrlist=list_to_matrix(all_train,n_gram=n)
     if step == 'mysql_test':
         print('mysql test data processing ...........')
         all_train = get_all_call_sequences(dir_mysql_test)
-        train_arrlist=list_to_matrix(all_train)
+        train_arrlist=list_to_matrix(all_train,n_gram=n)
     if step == 'escp':
         print('escape data processing ...........')
-        alltrain = get_all_call_sequences(dir_escp)
+        alltrain = get_all_call_sequences(dir_escp,n_gram=n)
         train_arrlist=list_to_matrix(alltrain)
     if save :
         fpath="arrayfile/"+step+"/"

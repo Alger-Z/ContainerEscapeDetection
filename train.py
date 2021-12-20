@@ -21,8 +21,6 @@ save=True
 load =True
 batch_size = 50
 feature_dimension = 323
-
-
     
 
 def save_model_weight_into_file(model, modelname="model.json", weight="model.h5"):
@@ -85,18 +83,18 @@ def build_model(mod='lstm'):
     return model
 
 
-def run_network(model=None, train_data=None,act='train'):
+def run_network(model=None, train_data=None,act='train',n_gram=20):
 
     global_start_time = time.time()
 
     if train_data is None:
         print 'Loading data... '
         if act == 'train':
-            xtrainlist, ytrainlist  = preprocess.preprocess(step='train')
+            xtrainlist, ytrainlist  = preprocess.preprocess(step='train',n=n_gram)
         if act == 'test':
-            xtestlist,ytestlist = preprocess.preprocess(step='test')
+            xtestlist,ytestlist = preprocess.preprocess(step='test',n=n_gram)
         if act == 'escp':
-            xtestlist,ytestlist = preprocess.preprocess(step='escp')
+            xtestlist,ytestlist = preprocess.preprocess(step='escp',n=n_gram)
     else:
         X_train, y_train = train_data
     
@@ -125,8 +123,8 @@ def run_network(model=None, train_data=None,act='train'):
                 validation_split=0.05)
             model.summary()
         if save :
-            save_model_weight_into_file(model)
-            saveintopickle(history,"history.txt")
+            save_model_weight_into_file(model,modelname=("modle"+str(n_gram)+"gram.json"),weight=("model"+str(n_gram)+"gram.h5"))
+            saveintopickle(history,("history"+str(n_gram)+"gram.txt"))
             
         print("Done Training...")
     if act == 'test' or 'escp':
@@ -171,15 +169,18 @@ def run_network(model=None, train_data=None,act='train'):
 if __name__ == "__main__":
     action='train'
     debug =True
-    if debug :
-        epochs = 3
-        save = False
-        if action == 'train':
-            load = False
+    
     try: 
         if len(sys.argv) > 1 :
             action=sys.argv[1]
-        print( "run for %s",action)
-        run_network(act=action)
+        if debug :
+            epochs = 3
+            save = False
+            if action == 'train':
+                load = False
+        n=[10,15,20,25]
+        for ngram in n :
+            print( "run for %s debug = %b epoch= %d save = %b ngram=%d",action,debug,epochs,save,ngram)
+            run_network(act=action,n_gram=ngram)
     except Exception as e:
         print(sys.argv,e)
