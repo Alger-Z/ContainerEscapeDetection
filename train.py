@@ -12,7 +12,7 @@ from io_helper import saveintopickle
 import sys
 from W2c import build_lstm
 import preprocess
-from visualization import roc_plt
+from visualization import *
 import glbal
 
 # Global hyper-parameters
@@ -48,6 +48,10 @@ def load_model_and_weight_from_file(modelname="model.json", weight="model.h5"):
         loaded_model=None
     
     return loaded_model
+
+def get_topk_index_list(prob_list,k):
+    return np.argsort(prob_list)[-k:]
+
 
 def build_model(mod='lstm'):
     # if mod == 'lstm':
@@ -131,44 +135,38 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
             model.summary()
         if save :
             save_model_weight_into_file(model,modelname=("model"+str(n_gram)+"gram.json"),weight=("model"+str(n_gram)+"gram.h5"))
-            saveintopickle(history,("history"+str(n_gram)+"gram.txt"))
-            
+            saveintopickle(history.history,("history"+str(n_gram)+"gram.txt"))
         print("\n Done Training...")
+        
+        
     if act == 'test' or act =='escp':
         acc=[] 
+        sq_size=20000
+        if debug:
+            sq_size=20000
         print("\n \n  Start predicting \n \n")
         for xtest,ytest in zip(xtestlist,ytestlist):
-            print("\n \n  Start predicting \n \n")
-            predicted = model.predict(xtest[:20000])
+            print("\n \n predicting \n \n")
+            
+            predicted = model.predict(xtest[:sq_size])
+            
+            sq_prob_pic(ytrue=ytest[:sq_size],pred=predicted,name="dvwa_test")
             
             y_prd = [np.argmax(y) for y in predicted]  # 取出y中元素最大值所对应的索引
-            y_tr = [np.argmax(y) for y in ytest[:20000]]
+            y_tr = [np.argmax(y) for y in ytest[:sq_size]]
             acc=0
             for yp,yt in zip(y_prd,y_tr):
                 if yp == yt :
                     acc =acc+1
             acc= acc/float(len(y_prd))
             print ("\n acc for len %d : %f ",len(y_prd),acc )
+            
             #roc_plt(predicted,ytest)
             
             # print("Reshaping predicted")
             # predicted = np.reshape(predicted, (predicted.size,))
+            break
             
-            # plt.figure(1)
-            # plt.subplot(311)
-            # plt.title("Actual Test Signal w/Anomalies")
-            # plt.plot(ytest[:len(ytest)], 'b')
-            # plt.subplot(312)
-            # plt.title("Predicted Signal")
-            # plt.plot(predicted[:len(ytest)], 'g')
-            # plt.subplot(313)
-            # plt.title("Squared Error")
-            # mse = ((ytest - predicted) ** 2)
-            # plt.plot(mse, 'r')
-            # #plt.show()
-            # fig_path =os.getcwd()+'/test.png'
-            # plt.savefig(fig_path)
-            #break 
         print("done")
 
 
@@ -179,19 +177,20 @@ if __name__ == "__main__":
     glbal._init()
     #debug = glbal.set_debug()
     debug = glbal.get_debug()
-    if action == 'train':
-        load = False
+    
     try: 
         if len(sys.argv) > 1 :
             action=sys.argv[1]
         if debug :
             epochs = 3
             save = False
-    
+        if action == 'train':
+            load = False
         n=[10,15,20,25]
         for ngram in n :
             sequence_length=ngram-1
             print( "\n run for %s debug = %s epoch= %d save = %s ngram=%d",action,debug,epochs,save,ngram)
             run_network(act=action,n_gram=ngram)
+        # run_network(act=action,n_gram=20)
     except Exception as e:
         print(sys.argv,e)

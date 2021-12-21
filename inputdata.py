@@ -146,8 +146,8 @@ def list_to_matrix(allthelist,n_gram=20):
         arraysize = 2000
         arraycount=2 
     else :
-        arraysize = 200
-        arraycount=1
+        arraysize = 100000
+        arraycount= 10
     
     arraylist = []
     array=None

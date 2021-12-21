@@ -7,6 +7,17 @@ sc_tb_file = "syscall_64.tbl"
 #sc_tb_pickle= "sc_map.pickle"
 sc_adfa="adfa-syscall.h"
 
+def get_sc_map_reverse():
+    sc_map = load_sc_map()
+    if not sc_map :
+        print("sc_map load failed")
+        return
+    reverse_map={}
+    for sc,idex in sc_map.items():
+        reverse_map[str(idex)]=sc
+    return reverse_map
+
+
 def foundone (target,name):
     if 1 in target :
         print ('found 1 in' ,name,' and index',target.index(1))

@@ -7,7 +7,7 @@ import sys
 
 def saveintopickle(obj, filename):
     with open(filename, 'wb') as handle:
-        pickle.dump(obj, handle, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(obj, handle)
 
     print ("[Pickle]: save object into {}".format(filename))
     return

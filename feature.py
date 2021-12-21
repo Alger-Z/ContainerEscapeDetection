@@ -103,6 +103,8 @@ def sysindex_():
     flist = readfilesfromAdir(path)
     # flist=[]
     # flist.append("data/runc_cpt.txt.new")
+    
+    # generate map for syscall number to syscall name
     sc_map = load_sc_map()
     if not sc_map :
         print("sc_map load failed")
@@ -110,6 +112,7 @@ def sysindex_():
     reverse_map={}
     for sc,idex in sc_map.items():
         reverse_map[str(idex)]=sc
+        
     datal=[]
     
     for f in flist:

@@ -5,6 +5,7 @@ import numpy as np
 import pandas 
 import os
 import random
+from io_helper import loadfrompickle
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve
 from sklearn.metrics import auc
@@ -67,8 +68,44 @@ def show_wv(words_vocab,words_vec):
     #         print (sc,similar,'\n')
     #     except:
     #         continue
+    
+    
+def sq_prob_pic(ytrue,pred,name):
+    plt.figure(1)
+    plt.title("Syscall subsequence probilities")
+    y_tr_index = [np.argmax(y) for y in ytrue] # 得到真实系统调用index 的列表
+    prob = [pred[it][y_tr_index[it]] for it in range (len(y_tr_index))] # 查找得到对应概率列表
+    prob_sq=1
+    prob_sq_list=[]
+    for i in range (0,10,1):
+        prob_sq*=prob[i]
+    for i in range(10,len(prob),1):
+        prob_sq_list.append(prob_sq*prob[i]/prob[i-10])
+    # prob = [prob[x]  for x in range(0,len(prob),1) ] #直接给出目标系统调用概率变化
+    plt.plot(prob_sq_list, 'b')
+    plt.savefig('pic/'+name+".png")
+    
+def acc_loss_plt(history,pic_name):
+    plt.figure()
+    
+    plt.subplot(211)
+    plt.plot(history['acc'])
+    plt.plot(history['val_acc'])
+    plt.title('Model accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Test'], loc='upper left')
 
-
+    # 绘制训练 & 验证的损失值
+    plt.subplot(212)
+    plt.plot(history['loss'])
+    plt.plot(history['val_loss'])
+    plt.title('Model loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Test'], loc='upper left')
+    
+    plt.savefig('pic/'+pic_name+"_loss.png")
 
 def roc_plt(y_true,y_prd):
     y_prd = [np.argmax(y) for y in y_prd]  # 取出y中元素最大值所对应的索引
@@ -90,3 +127,10 @@ def roc_plt(y_true,y_prd):
     plt.title('ROC curve')
     plt.legend(loc='best')
     plt.savefig('pic/ROC.png')
+    
+    
+if __name__ == '__main__':
+    historyfile = "history20gram.txt"
+    
+    history=loadfrompickle(historyfile)
+    acc_loss_plt(history=history,pic_name=historyfile.split(".")[0])
