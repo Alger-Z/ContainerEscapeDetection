@@ -13,6 +13,7 @@ import sys
 from W2c import build_lstm
 import preprocess
 from visualization import roc_plt
+import glbal
 
 # Global hyper-parameters
 sequence_length = 19
@@ -49,8 +50,9 @@ def load_model_and_weight_from_file(modelname="model.json", weight="model.h5"):
     return loaded_model
 
 def build_model(mod='lstm'):
-    if mod == 'lstm ':
-        return build_lstm
+    # if mod == 'lstm':
+    #     return build_lstm
+    
     model = Sequential()
     layers = {'input': feature_dimension, 'hidden1': 64, 'hidden2': 256, 'hidden3': 100, 'output': feature_dimension}
 
@@ -79,7 +81,7 @@ def build_model(mod='lstm'):
     model.compile(loss="categorical_crossentropy", optimizer='rmsprop',  metrics=['accuracy'])
     #model.compile(loss="mse", optimizer="rmsprop")
 
-    print "Compilation Time : ", time.time() - start
+    print ("Compilation Time : ", time.time() - start)
     return model
 
 
@@ -88,12 +90,16 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
     global_start_time = time.time()
 
     if train_data is None:
-        print 'Loading data... '
+        
         if act == 'train':
+            print ('\n Loading  train data... ')
             xtrainlist, ytrainlist  = preprocess.preprocess(step='train',n=n_gram)
+            
         if act == 'test':
+            print ('\n Loading  test data... ')
             xtestlist,ytestlist = preprocess.preprocess(step='test',n=n_gram)
         if act == 'escp':
+            print ('\n Loading  escp data... ')
             xtestlist,ytestlist = preprocess.preprocess(step='escp',n=n_gram)
     else:
         X_train, y_train = train_data
@@ -101,21 +107,22 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
     
     if model is None and load is True:
         try :
+            print("\n \n model load from file \n \n ")
             model=load_model_and_weight_from_file()
         except Exception as e:
-            print 'load model failed :',e
+            print ('\n load model failed :%s',e)
     if model is None:
         model= build_model()
     
-    print 'Model compile'
+    print ('\n Model compile \n')
     model.compile(loss="categorical_crossentropy", optimizer='rmsprop',  metrics=['accuracy'])
+    
     if act == 'train':
-        print("Training...")
         for X_train,y_train in zip(xtrainlist,ytrainlist):    
-            print ("X_train, y_train,shape")
+            print ("\n X_train, y_train,shape")
             print (X_train.shape)
             print (y_train.shape)
-            print '\n \n Data Loaded. Compiling...\n \n'
+            print ('\n \n Start Training...\n \n')
             history=model.fit(
                 X_train, y_train,
                 batch_size=batch_size,
@@ -126,11 +133,12 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
             save_model_weight_into_file(model,modelname=("model"+str(n_gram)+"gram.json"),weight=("model"+str(n_gram)+"gram.h5"))
             saveintopickle(history,("history"+str(n_gram)+"gram.txt"))
             
-        print("Done Training...")
+        print("\n Done Training...")
     if act == 'test' or act =='escp':
         acc=[] 
+        print("\n \n  Start predicting \n \n")
         for xtest,ytest in zip(xtestlist,ytestlist):
-            print("\n \n predicting \n \n")
+            print("\n \n  Start predicting \n \n")
             predicted = model.predict(xtest[:20000])
             
             y_prd = [np.argmax(y) for y in predicted]  # 取出y中元素最大值所对应的索引
@@ -140,7 +148,7 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
                 if yp == yt :
                     acc =acc+1
             acc= acc/float(len(y_prd))
-            print ("acc for len %d : %f ",len(y_prd),acc )
+            print ("\n acc for len %d : %f ",len(y_prd),acc )
             #roc_plt(predicted,ytest)
             
             # print("Reshaping predicted")
@@ -168,20 +176,22 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
 
 if __name__ == "__main__":
     action='train'
-    debug =True
-    
+    glbal._init()
+    #debug = glbal.set_debug()
+    debug = glbal.get_debug()
+    if action == 'train':
+        load = False
     try: 
         if len(sys.argv) > 1 :
             action=sys.argv[1]
         if debug :
             epochs = 3
             save = False
-            if action == 'train':
-                load = False
+    
         n=[10,15,20,25]
         for ngram in n :
             sequence_length=ngram-1
-            print( "run for %s debug = %b epoch= %d save = %b ngram=%d",action,debug,epochs,save,ngram)
+            print( "\n run for %s debug = %s epoch= %d save = %s ngram=%d",action,debug,epochs,save,ngram)
             run_network(act=action,n_gram=ngram)
     except Exception as e:
         print(sys.argv,e)

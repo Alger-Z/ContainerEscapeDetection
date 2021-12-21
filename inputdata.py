@@ -4,8 +4,10 @@ from logging import debug
 import os
 import sys
 import numpy as np
+from numpy.core.numeric import array_repr
 import io_helper
-mydebug=True
+import glbal
+
 
 def readfilesfromAdir(datadir):
     #read a list of files
@@ -140,34 +142,34 @@ def sequence_n_gram_parsing(alist,n_gram=20,num_class=323):
     return (ans)
 
 def list_to_matrix(allthelist,n_gram=20):
-    global mydebug
-    if mydebug :
+    if glbal.get_debug() :
         arraysize = 2000
         arraycount=2 
     else :
-        arraysize = 1000000
-        arraycount=10
-    array = sequence_n_gram_parsing(allthelist[0][:2000],n_gram=n_gram)
+        arraysize = 200
+        arraycount=1
+    
     arraylist = []
-    if len(allthelist) == 1 :
-        arraylist.append(array)
-        print(array.shape)
-        return arraylist
-    for i in range(1,len(allthelist),1):
-        tmp = sequence_n_gram_parsing(allthelist[i][:2000],n_gram=n_gram)
-        
-        if (len(array)> arraysize):
-            arraylist.append(array)
-            array=tmp
-        else:
-            array = np.concatenate((array, tmp), axis=0)
-        
+    array=None
+    # array = sequence_n_gram_parsing(allthelist[0][:],n_gram=n_gram)
+    # if len(allthelist) == 1 :
+    #     arraylist.append(array)
+    #     print(array.shape)
+    #     return arraylist
+    for i in range(0,len(allthelist),1):
+        #limit series array list size
         if len(arraylist) > arraycount :
-                break 
-            
+            print("\n reach limit of array list size")
+            break 
+        arraysize=arraysize if(len(allthelist[i])>arraysize) else len(allthelist[i])
+        tmp = sequence_n_gram_parsing(allthelist[i][:arraysize],n_gram=n_gram)
+        # limit signle series array size
+        arraylist.append(tmp)
         percent = (i+0.0)/len(allthelist)
         io_helper.drawProgressBar(percent)
-
+        
+        
+        
         #print ("array shape")
         #print (array.shape)
 
@@ -219,7 +221,8 @@ def process_log(step='dvwa_train',save=False,n=20):
     
     
 if __name__ == "__main__":
-    mydebug =True
+    glbal._init()
+    glbal.set_debug()
     process_log(step='dvwa_train')
 
 
