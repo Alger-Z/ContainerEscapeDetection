@@ -45,7 +45,7 @@ def get_debug():
     return global_dict["debug"]
 def get_array_limit():
     if global_dict["debug"] :
-        arraysize = 20000
+        arraysize = 2000
         arraycount=2 
     else :
         arraysize = 100000

@@ -4,6 +4,7 @@ from logging import debug
 import os
 from re import L
 import sys
+from keras.backend.theano_backend import not_equal
 import numpy as np
 from numpy.core.defchararray import count
 from numpy.core.numeric import array_repr
@@ -184,20 +185,33 @@ def list_to_matrix(allthelist,n_gram=20):
     #     arraylist.append(array)
     #     print(array.shape)
     #     return arraylist
+    short= None
     for i in range(0,len(allthelist),1):
         #limit series array list size
         if len(arraylist) > arraycount :
             print("\n reach limit of array list size")
             break 
         arraysize=arraysize if(len(allthelist[i])>arraysize) else len(allthelist[i])
-        tmp = sequence_n_gram_parsing(allthelist[i][:arraysize],n_gram=n_gram)
+        
         # limit signle series array size
-        arraylist.append(tmp)
+        tmp = sequence_n_gram_parsing(allthelist[i][:arraysize],n_gram=n_gram)
+        if len(tmp) > arraysize :
+            arraylist.append(tmp)
+        else:
+            if short is not None:
+                short=np.concatenate((short,tmp),axis=0)
+            else:
+                short=tmp
+            if len(short) > arraysize:
+                arraylist.append(short)
+                short=None
+        
         percent = (i+0.0)/len(allthelist)
         utils.drawProgressBar(percent)
         #print ("array shape")
         #print (array.shape)
-
+    if short is not None:
+        arraylist.append(short)
     for array in arraylist:
         print (array.shape)
     print ("done")
