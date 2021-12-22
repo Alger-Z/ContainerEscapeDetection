@@ -68,8 +68,8 @@ def predict(model=None,act='test',n_gram=20):
         print("\n \n predicting for testlist {} \n \n".format(count))
         predicted = model.predict(xtest[:sq_size])
         if save :
-            saveintopickle(predicted,"predict.pickle")
-            saveintopickle(ytest[:sq_size],"ytest.pickle")
+            saveintopickle(predicted,"output/predict.pickle")
+            saveintopickle(ytest[:sq_size],"output/ytest.pickle")
         if pic:
             sq_prob_pic(ytrue=ytest[:sq_size],pred=predicted,name="dvwa_test")
         

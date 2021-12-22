@@ -150,7 +150,7 @@ if __name__ == '__main__':
     #                 validation_split=0.05)
     #     model.summary()
     #     model.save(modelpath2)
-    #     saveintopickle(history.history,"tr_history.txt")
+    #     saveintopickle(history.history,"output/tr_history.txt")
     
     # # Make predictions using the validate set
     # if act == 1 :

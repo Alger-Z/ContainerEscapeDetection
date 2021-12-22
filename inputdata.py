@@ -59,7 +59,7 @@ def gen_scgram_dic(allthelist,n_gram=20):
                 ngramdic[tmp]=1
     print("ngram count:",len(ngramdic.keys()))
     ngramdic_sorted=sorted(ngramdic.items(),key = lambda a:a[1],reverse = True)
-    saveintopickle(ngramdic_sorted, str(n_gram)+"gramdic_sorted.pickle")
+    saveintopickle(ngramdic_sorted, str(n_gram)+"output/gramdic_sorted.pickle")
     
 def statis_ngram_dic(dic_name):
     dic=loadfrompickle(dic_name)
@@ -250,6 +250,6 @@ if __name__ == "__main__":
     #glbal.set_debug()
     dir_dvwa_train =glbal.get_data_dir("dir_dvwa_train")
     #get_all_call_sequences(dir_dvwa_train)
-    statis_ngram_dic("15gramdic_sorted.pickle")
+    statis_ngram_dic("output/15gramdic_sorted.pickle")
 
 

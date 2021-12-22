@@ -134,8 +134,8 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
                 validation_split=0.05)
             model.summary()
         if save :
-            save_model_weight_into_file(model,modelname=("model"+str(n_gram)+"gram.json"),weight=("model"+str(n_gram)+"gram.h5"))
-            saveintopickle(history.history,("history"+str(n_gram)+"gram.txt"))
+            save_model_weight_into_file(model,modelname=("output/model"+str(n_gram)+"gram.json"),weight=("output/model"+str(n_gram)+"gram.h5"))
+            saveintopickle(history.history,("output/history"+str(n_gram)+"gram.txt"))
         print("\n Done Training...")
         
         
@@ -149,8 +149,8 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
             print("\n \n predicting \n \n")
             
             predicted = model.predict(xtest[:sq_size])
-            #saveintopickle(predicted,"predict.pickle")
-            #saveintopickle(ytest[:sq_size],"ytest.pickle")
+            #saveintopickle(predicted,"output/predict.pickle")
+            #saveintopickle(ytest[:sq_size],"output/ytest.pickle")
             #sq_prob_pic(ytrue=ytest[:sq_size],pred=predicted,name="dvwa_test")
             
             y_prd = [np.argmax(y) for y in predicted]  # 取出y中元素最大值所对应的索引
