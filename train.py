@@ -93,21 +93,9 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
 
     global_start_time = time.time()
 
-    if train_data is None:
-        
-        if act == 'train':
-            print ('\n Loading  train data... ')
-            xtrainlist, ytrainlist  = preprocess.preprocess(step='train',n=n_gram)
-            
-        if act == 'test':
-            print ('\n Loading  test data... ')
-            xtestlist,ytestlist = preprocess.preprocess(step='test',n=n_gram)
-        if act == 'escp':
-            print ('\n Loading  escp data... ')
-            xtestlist,ytestlist = preprocess.preprocess(step='escp',n=n_gram)
-    else:
-        X_train, y_train = train_data
-    
+    if act == 'train':
+        print ('\n Loading  train data... ')
+        xtrainlist, ytrainlist  = preprocess.preprocess(step='train',n=n_gram)
     
     if model is None and load is True:
         try :
@@ -138,37 +126,6 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
             saveintopickle(history.history,("output/history"+str(n_gram)+"gram.txt"))
         print("\n Done Training...")
         
-        
-    if act == 'test' or act =='escp':
-        acc=[] 
-        sq_size=20000
-        if debug:
-            sq_size=20000
-        print("\n \n  Start predicting \n \n")
-        for xtest,ytest in zip(xtestlist,ytestlist):
-            print("\n \n predicting \n \n")
-            
-            predicted = model.predict(xtest[:sq_size])
-            #saveintopickle(predicted,"output/predict.pickle")
-            #saveintopickle(ytest[:sq_size],"output/ytest.pickle")
-            #sq_prob_pic(ytrue=ytest[:sq_size],pred=predicted,name="dvwa_test")
-            
-            y_prd = [np.argmax(y) for y in predicted]  # 取出y中元素最大值所对应的索引
-            y_tr = [np.argmax(y) for y in ytest[:sq_size]]
-            acc=0
-            for yp,yt in zip(y_prd,y_tr):
-                if yp == yt :
-                    acc =acc+1
-            acc= acc/float(len(y_prd))
-            print ("\n acc for len %d : %f ",len(y_prd),acc )
-            
-            #roc_plt(predicted,ytest)
-            
-            # print("Reshaping predicted")
-            # predicted = np.reshape(predicted, (predicted.size,))
-            break
-            
-        print("done")
 
 
     

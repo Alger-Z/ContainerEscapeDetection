@@ -62,10 +62,11 @@ def predict(model=None,act='test',n_gram=20):
    
     acc=[] 
     
-    print("\n \n  Start predicting \n \n")
+    print("\n \n Start predicting \n \n")
     count =1 
     for xtest,ytest in zip(xtestlist,ytestlist):
         print("\n \n predicting for testlist {} \n \n".format(count))
+        count+=1
         predicted = model.predict(xtest[:sq_size])
         if save :
             saveintopickle(predicted,"output/predict.pickle")
@@ -100,7 +101,6 @@ if __name__ == "__main__":
     sq_size=2000
     save= False
     pic =False
-    sequence_length = 19
     load =True
     modname = "output/model"+str(ngram)+"gram.json"
     modweight ="output/model"+str(ngram)+"gram.h5"

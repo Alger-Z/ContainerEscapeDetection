@@ -12,6 +12,7 @@ from io_helper import loadfrompickle, saveintopickle
 import utils
 import glbal
 
+runalone=False
 
 def readfilesfromAdir(datadir):
     #read a list of files

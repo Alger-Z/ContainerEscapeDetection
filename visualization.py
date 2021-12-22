@@ -148,7 +148,7 @@ def load_model_and_weight_from_file(modelname="model.json", weight="model.h5"):
     return loaded_model   
 if __name__ == '__main__':
     #预测过程分析
-    historyfile = "output/history15gram.txt"
+    historyfile = "output/history25gram.txt"
     history=loadfrompickle(historyfile)
     acc_loss_plt(history=history,pic_name=os.path.basename(historyfile).split(".")[0])
     
@@ -157,6 +157,6 @@ if __name__ == '__main__':
     # plot_model(model,to_file="pic/model.png",show_shapes=True)
     
     #预测结果分析
-    # prd= loadfrompickle("predict.pickle")
-    # ytest=loadfrompickle("ytest.pickle")
+    # prd= loadfrompickle("output/predict.pickle")
+    # ytest=loadfrompickle("output/ytest.pickle")
     # sq_prob_pic(ytest,prd,"dvwa_test")
