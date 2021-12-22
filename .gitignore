@@ -6,3 +6,5 @@ tmp/*
 data/*
 *.h5
 *.json
+*.pickle
+*.pickle
