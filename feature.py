@@ -27,6 +27,7 @@ def dist_pic(sc_dic,name,sc_map=None):
     if sc_map:
         sc=[sc_map[x] for x in sc] 
     counts=counts[:sc_num]
+    
     index= np.arange(sc_num)
     p2=plt.bar(index,counts,width=bar_width,label="count",color='b')
     plt.xlabel('syscall')
@@ -80,6 +81,7 @@ def statis(file,type):
     sc=sorted(sc.items(),key = lambda a:a[1],reverse = True)
     if (len(sc)<5):
         print("%s ignored for less than 5 types:%d",file,len(sc))
+        print()
     #print(sc)
     
     #dist_pic(sc,os.path.basename(file).split('.')[0])

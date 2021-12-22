@@ -6,6 +6,8 @@ import sys
 import json
 from typing import KeysView
 from utils import *
+import glbal
+
 def log_to_seq(filepath):
     seq=[]
     with open (filepath,'r') as f:
@@ -70,28 +72,9 @@ def start_process():
 
 if __name__ == "__main__":
 
-    sc_map_json="sc_map.json"
-    log_path= "data/mysql/mix_big"
-    txt_path="data/mysqltxt/mix_big/"
+    sc_map_json=glbal.get_data_dir("sc_map_json")
+    log_path=glbal.get_data_dir("mysql_log_path")
+    txt_path=glbal.get_data_dir("mysql_txt_path")
     sc_map={}
     failed={}
-    #map new syscall type to old 
-    sc_n2o={ 
-     "select":"pselect6",
-    "pipe":"pipe2",
-    "access":"faccessat",
-    "newfstatat":"fstatat",
-    "lstat":"fstatat",
-    "open_by_handle_at":"openat",
-    "stat":"fstatat",
-    "mkdir":"mkdirat",
-    "readlink":"readlinkat",
-    "getdents":"getdents64",
-    "dup2":"dup",
-    "chown":"fchown",
-    "getpgrp":"getpgid",
-    "arch_prctl":"prctl"
-    }
-    sc_n={
-    }
     start_process()

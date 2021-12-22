@@ -8,7 +8,7 @@ from keras.layers.core import Dense, Activation, Dropout
 from keras.layers.recurrent import LSTM
 from keras.models import Sequential
 from keras.models import model_from_json
-from io_helper import saveintopickle
+from utils import saveintopickle
 import sys
 from W2c import build_lstm
 import preprocess
@@ -111,8 +111,8 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
     
     if model is None and load is True:
         try :
-            print("\n \n model load from file \n \n ")
-            model=load_model_and_weight_from_file()
+            print("\n \n model load from file:",modname,modweight)
+            model=load_model_and_weight_from_file(modelname=modname,weight=modweight)
         except Exception as e:
             print ('\n load model failed :%s',e)
     if model is None:
@@ -149,8 +149,9 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
             print("\n \n predicting \n \n")
             
             predicted = model.predict(xtest[:sq_size])
-            
-            sq_prob_pic(ytrue=ytest[:sq_size],pred=predicted,name="dvwa_test")
+            #saveintopickle(predicted,"predict.pickle")
+            #saveintopickle(ytest[:sq_size],"ytest.pickle")
+            #sq_prob_pic(ytrue=ytest[:sq_size],pred=predicted,name="dvwa_test")
             
             y_prd = [np.argmax(y) for y in predicted]  # 取出y中元素最大值所对应的索引
             y_tr = [np.argmax(y) for y in ytest[:sq_size]]
@@ -175,9 +176,10 @@ def run_network(model=None, train_data=None,act='train',n_gram=20):
 if __name__ == "__main__":
     action='train'
     glbal._init()
-    #debug = glbal.set_debug()
-    debug = glbal.get_debug()
-    
+    debug = glbal.set_debug()
+    #debug = glbal.get_debug()
+    modname = "output/model20gram.json"
+    modweight ="output/model20gram.h5"
     try: 
         if len(sys.argv) > 1 :
             action=sys.argv[1]
@@ -186,11 +188,11 @@ if __name__ == "__main__":
             save = False
         if action == 'train':
             load = False
-        n=[10,15,20,25]
-        for ngram in n :
-            sequence_length=ngram-1
-            print( "\n run for %s debug = %s epoch= %d save = %s ngram=%d",action,debug,epochs,save,ngram)
-            run_network(act=action,n_gram=ngram)
-        # run_network(act=action,n_gram=20)
+        # n=[10,15,20,25]
+        # for ngram in n :
+        #     sequence_length=ngram-1
+        #     print( "\n run for %s debug = %s epoch= %d save = %s ngram=%d").format(action,debug,epochs,save,ngram)
+        #     run_network(act=action,n_gram=ngram)
+        run_network(act=action,n_gram=20)
     except Exception as e:
         print(sys.argv,e)

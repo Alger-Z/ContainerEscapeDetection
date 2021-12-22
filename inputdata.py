@@ -2,10 +2,14 @@
 # -*- coding: utf-8 -*-
 from logging import debug
 import os
+from re import L
 import sys
 import numpy as np
+from numpy.core.defchararray import count
 from numpy.core.numeric import array_repr
-import io_helper
+import matplotlib.pyplot as plt
+from io_helper import loadfrompickle, saveintopickle
+import utils
 import glbal
 
 
@@ -44,44 +48,73 @@ def get_attack_subdir(path):
     #print (subdirectories)
     return (subdirectories)
 
+def gen_scgram_dic(allthelist,n_gram=20):
+    ngramdic={}
+    for alist in allthelist:
+        for i in range(0,len(alist)-n_gram+1,1):
+            tmp = str(alist[i:i+n_gram])
+            if tmp in ngramdic:
+                ngramdic[tmp]+=1
+            else:
+                ngramdic[tmp]=1
+    print("ngram count:",len(ngramdic.keys()))
+    ngramdic_sorted=sorted(ngramdic.items(),key = lambda a:a[1],reverse = True)
+    saveintopickle(ngramdic_sorted, str(n_gram)+"gramdic_sorted.pickle")
+    
+def statis_ngram_dic(dic_name):
+    dic=loadfrompickle(dic_name)
+    print ("top 5 frequence ngram")
+    for i in range (0,5):
+        print(dic[i])
+    print ("bottom 5 frequence ngram")
+    for i in range (0,5):
+        print(dic[len(dic)-i-1])
+    total=0
+    #count_dic=[ 0 for i in range (dic[0][1]+1)]
+    count_dic={}
+    for key,times in dic:
+        total+=times
+        if times in count_dic:
+            count_dic[times]+=1
+        else:
+            count_dic[times]=1
+    count_tuplist=sorted(count_dic.items(),key = lambda a:a[1])
+    timeslist=[]
+    countlist=[]
+    for tp in count_tuplist:
+        timeslist.append(tp[0])
+        countlist.append(tp[1])
 
+    #count_dic=[x/total for x in count_dic]
+    
+    
+    plt.figure()
+    plt.title("20 gram distribution")
+    plt.plot(timeslist,countlist,'black')
+    plt.savefig("pic/20gramd_dist.png")
+        
 def get_all_call_sequences(dire):
     try:
         files = dirlist(dire,[])
     except Exception as e:
-        print ("%s dir error",dire)
+        print ("{} get sequence error",e)
         return []
     allthelist = []
     #print (len(files))
     for eachfile in files: 
         allthelist.append(readCharsFromFile(eachfile))  
-
-    elements = []
-    for item in allthelist:
-        for key in item:
-            if key not in elements:
-                elements.append(key)
-
-    elements = map(int,elements)
-    elements = sorted(elements)
-
-    print ("The total unique elements:")
-    print (elements)
-
-    print ("The maximum number of elements:")
-    print (max(elements))
-
-    #print ("The length elements:")
-    #print (len(elements))
+    #generate sc ngram dictionary,sorted by apperance times
+    if runalone:
+        gen_scgram_dic(allthelist,15)
+    
+    print("The length of all the list ")
     print (len(allthelist))
-
+    
     #clean the all list data set
     _max = 0
     for i in range(0,len(allthelist)):
         _max = max(_max,len(allthelist[i]))
         allthelist[i] = map(int,allthelist[i])
-    
-
     print ("The maximum length of a sequence is that {}".format(_max))
 
     return (allthelist)
@@ -122,9 +155,7 @@ def convertToOneHot(vector, num_classes=None):
     result[np.arange(len(vector)), vector] = 1
     return result.astype(int)
 
-"""
-The num_class here is set as 341
-"""
+
 
 #one function do one thing
 def sequence_n_gram_parsing(alist,n_gram=20,num_class=323):
@@ -134,6 +165,7 @@ def sequence_n_gram_parsing(alist,n_gram=20,num_class=323):
     ans = []
     for i in range(0,len(alist)-n_gram+1,1):
         tmp = alist[i:i+n_gram]
+        
         oneHot = convertToOneHot(np.asarray(tmp), num_class)
         ans.append(oneHot)
 
@@ -142,13 +174,8 @@ def sequence_n_gram_parsing(alist,n_gram=20,num_class=323):
     return (ans)
 
 def list_to_matrix(allthelist,n_gram=20):
-    if glbal.get_debug() :
-        arraysize = 2000
-        arraycount=2 
-    else :
-        arraysize = 100000
-        arraycount= 10
-    
+    print("\n convert list to matrix")
+    arraysize,arraycount= glbal.get_array_limit()
     arraylist = []
     array=None
     # array = sequence_n_gram_parsing(allthelist[0][:],n_gram=n_gram)
@@ -166,10 +193,7 @@ def list_to_matrix(allthelist,n_gram=20):
         # limit signle series array size
         arraylist.append(tmp)
         percent = (i+0.0)/len(allthelist)
-        io_helper.drawProgressBar(percent)
-        
-        
-        
+        utils.drawProgressBar(percent)
         #print ("array shape")
         #print (array.shape)
 
@@ -179,16 +203,16 @@ def list_to_matrix(allthelist,n_gram=20):
 
     return arraylist
 
-def process_log(step='dvwa_train',save=False,n=20):
+def process_log(step='dvwa_train',save_into_pickle=False,n=20):
     att_arrlist=[]
     train_arrlist=[]
     val_arrlist=[]
     
-    dir_mysql_train = "data/mix_txt"
-    dir_mysql_test = "data/mysqltxt_test"
-    dir_dvwa_train ="data/dvwatxt"
-    dir_dvwa_test = "data/dvwatxt_test"
-    dir_escp="data/att_withreq"
+    dir_mysql_train =glbal.get_data_dir("dir_mysql_train")  
+    dir_mysql_test =glbal.get_data_dir("dir_mysql_test")  
+    dir_dvwa_train =glbal.get_data_dir("dir_dvwa_train")
+    dir_dvwa_test =glbal.get_data_dir("dir_dvwa_test")  
+    dir_escp =glbal.get_data_dir("dir_escp")
     
     if step == 'dvwa_train':
         print('dvwa Train data processing ...........')
@@ -210,11 +234,11 @@ def process_log(step='dvwa_train',save=False,n=20):
         print('escape data processing ...........')
         alltrain = get_all_call_sequences(dir_escp,n_gram=n)
         train_arrlist=list_to_matrix(alltrain)
-    if save :
+    if save_into_pickle :
         fpath="arrayfile/"+step+"/"
         for i in range (len(train_arrlist)):
             fname = fpath+step+str(i)+".pickle"
-            io_helper.saveintopickle(train_arrlist[i],fname)    
+            utils.saveintopickle(train_arrlist[i],fname)    
             
     return train_arrlist
 
@@ -222,7 +246,10 @@ def process_log(step='dvwa_train',save=False,n=20):
     
 if __name__ == "__main__":
     glbal._init()
-    glbal.set_debug()
-    process_log(step='dvwa_train')
+    runalone=True
+    #glbal.set_debug()
+    dir_dvwa_train =glbal.get_data_dir("dir_dvwa_train")
+    #get_all_call_sequences(dir_dvwa_train)
+    statis_ngram_dic("15gramdic_sorted.pickle")
 
 

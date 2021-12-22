@@ -28,7 +28,6 @@ from keras.models import Sequential, load_model
 from load_helper import *
 from visualization import *
 from utils import *
-from io_helper import *
 
 def word2idx(word,word_model):
   return word_model.wv.vocab[word].index

@@ -2,14 +2,17 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+from numpy.lib.shape_base import expand_dims
 import pandas 
 import os
 import random
-from io_helper import loadfrompickle
+from utils import loadfrompickle
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve
 from sklearn.metrics import auc
 from sklearn.manifold import TSNE
+from keras.utils import plot_model
+from keras.models import model_from_json
 
 from utils import foundone                   # final reduction
     
@@ -69,7 +72,7 @@ def show_wv(words_vocab,words_vec):
     #     except:
     #         continue
     
-    
+
 def sq_prob_pic(ytrue,pred,name):
     plt.figure(1)
     plt.title("Syscall subsequence probilities")
@@ -80,7 +83,8 @@ def sq_prob_pic(ytrue,pred,name):
     for i in range (0,10,1):
         prob_sq*=prob[i]
     for i in range(10,len(prob),1):
-        prob_sq_list.append(prob_sq*prob[i]/prob[i-10])
+        prob_sq =prob_sq*prob[i]/prob[i-10]
+        prob_sq_list.append(prob_sq)
     # prob = [prob[x]  for x in range(0,len(prob),1) ] #直接给出目标系统调用概率变化
     plt.plot(prob_sq_list, 'b')
     plt.savefig('pic/'+name+".png")
@@ -128,9 +132,31 @@ def roc_plt(y_true,y_prd):
     plt.legend(loc='best')
     plt.savefig('pic/ROC.png')
     
+def load_model_and_weight_from_file(modelname="model.json", weight="model.h5"):
+    try:
+        json_file = open(modelname, 'r')
+        loaded_model_json = json_file.read()
+        json_file.close()
+        loaded_model = model_from_json(loaded_model_json)
+        # load weights into new model
+        loaded_model.load_weights(weight)
+        print("Loaded model from disk, you can do more analysis more")
+    except Exception as e:
+        print("Loaded model error:",e)
+        loaded_model=None
     
+    return loaded_model   
 if __name__ == '__main__':
-    historyfile = "history20gram.txt"
-    
+    #预测过程分析
+    historyfile = "output/history15gram.txt"
     history=loadfrompickle(historyfile)
-    acc_loss_plt(history=history,pic_name=historyfile.split(".")[0])
+    acc_loss_plt(history=history,pic_name=os.path.basename(historyfile).split(".")[0])
+    
+    # 模型可视化
+    # model=load_model_and_weight_from_file()
+    # plot_model(model,to_file="pic/model.png",show_shapes=True)
+    
+    #预测结果分析
+    # prd= loadfrompickle("predict.pickle")
+    # ytest=loadfrompickle("ytest.pickle")
+    # sq_prob_pic(ytest,prd,"dvwa_test")
